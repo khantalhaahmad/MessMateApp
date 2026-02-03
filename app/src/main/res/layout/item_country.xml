@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="10dp">
+
+    <ImageView
+        android:id="@+id/imgFlag"
+        android:layout_width="24dp"
+        android:layout_height="24dp"/>
+
+    <TextView
+        android:id="@+id/tvCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:textSize="14sp"
+        android:textColor="#212121"/>
+
+    <!-- DROPDOWN ARROW (ONLY FOR SELECTED VIEW) -->
+    <ImageView
+        android:id="@+id/imgArrow"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="6dp"
+        android:src="@android:drawable/arrow_down_float"
+        android:tint="#777777"
+        android:visibility="gone"/>
+</LinearLayout>

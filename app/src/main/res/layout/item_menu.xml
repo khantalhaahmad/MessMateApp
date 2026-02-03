@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="170dp"
+    android:padding="16dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
+
+    android:background="@drawable/bg_card_white"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- ================= TEXT AREA ================= -->
+    <LinearLayout
+        android:id="@+id/layoutText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginEnd="16dp"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/layoutImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tvMenuName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="#111827"
+            android:maxLines="2"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/tvMenuDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#6B7280"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:layout_marginTop="6dp"/>
+
+        <TextView
+            android:id="@+id/tvMenuPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#F97316"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+    <!-- ================= IMAGE + ACTION ================= -->
+    <FrameLayout
+        android:id="@+id/layoutImage"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- FOOD IMAGE -->
+        <ImageView
+            android:id="@+id/imgMenu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_image_rounded"
+            android:src="@drawable/placeholder"/>
+
+        <!-- ADD BUTTON -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAdd"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:text="ADD"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#E23744"
+
+            android:layout_gravity="bottom"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="@android:color/transparent"
+            app:strokeColor="#E23744"
+            app:strokeWidth="1.5dp"
+            app:cornerRadius="22dp"/>
+
+        <!-- QTY CONTROLS -->
+        <LinearLayout
+            android:id="@+id/layoutQty"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="gone"
+
+            android:layout_gravity="bottom"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            android:background="@drawable/bg_qty_container_menu">
+
+            <TextView
+                android:id="@+id/btnMinus"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="−"
+                android:textColor="#E23744"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvQty"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="#E23744"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/btnPlus"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="+"
+                android:textColor="#E23744"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:enabled="true"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

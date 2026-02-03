@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:background="@drawable/circle_gray"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvResName"
+            android:text="Restaurant"
+            android:textStyle="bold"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/tvItemCount"
+            android:text="2 items"
+            android:textColor="@color/textSecondary"/>
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/btnViewCart"
+        android:text="View Cart"
+        android:textColor="@color/primary"
+        android:textStyle="bold"
+        android:padding="6dp"/>
+
+
+    <ImageView
+        android:id="@+id/btnClose"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/ic_close"
+        android:padding="3dp"/>
+
+</LinearLayout>

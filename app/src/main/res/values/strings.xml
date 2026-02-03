@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MessMate</string>
+
+    <string name="login_title">India’s #1 Mess Food Delivery App</string>
+    <string name="login_subtitle">Log in or sign up</string>
+    <string name="continue_btn">Continue</string>
+    <string name="or_text">or</string>
+    <string name="phone_hint">Enter mobile number</string>
+
+    <string name="terms_text">
+        By continuing, you agree to our\nTerms of Service   Privacy Policy   Content Policies
+    </string>
+
+</resources>

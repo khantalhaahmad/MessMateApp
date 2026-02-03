@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutPhoneEdit"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="10dp"
+    android:gravity="center_vertical"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+
+    <!-- Icon -->
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_phone"
+        android:tint="#6B7280"/>
+
+
+    <!-- Phone Text -->
+    <TextView
+        android:id="@+id/tvBillPhone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:text="Talha, +91-XXXXXXXXXX"
+        android:textSize="14sp"
+        android:textColor="#111827"/>
+
+
+    <!-- Arrow -->
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/ic_arrow_right"
+        android:tint="#9CA3AF"/>
+
+</LinearLayout>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ================= MATERIAL DEFAULT ================= -->
+
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+
+
+    <!-- ================= BASIC COLORS ================= -->
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="gray">#9E9E9E</color>
+    <color name="light_gray">#F5F5F5</color>
+
+
+    <!-- ================= TEXT COLORS ================= -->
+
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <color name="textHint">#9E9E9E</color>
+
+
+    <!-- ================= BACKGROUNDS ================= -->
+
+    <color name="bgMain">#FAFAFA</color>
+    <color name="bgCard">#FFFFFF</color>
+
+
+    <!-- ================= BRAND / ACCENT ================= -->
+
+    <!-- Zomato Style -->
+
+    <color name="primary">#FF6F00</color>
+    <color name="primaryDark">#E65100</color>
+
+    <color name="accent">#E23744</color>
+
+
+    <!-- ================= CATEGORY ================= -->
+
+    <color name="orange">#FF6F00</color>
+
+    <color name="categorySelected">#FF6F00</color>
+    <color name="categoryUnselected">#212121</color>
+
+
+    <!-- ================= STATUS / RATING ================= -->
+
+    <color name="green">#2E7D32</color>
+    <color name="ratingGreen">#1B5E20</color>
+
+    <color name="errorRed">#D32F2F</color>
+    <color name="successGreen">#388E3C</color>
+
+
+    <!-- ================= DIVIDER / BORDER ================= -->
+
+    <color name="divider">#E5E7EB</color>
+    <color name="border">#E0E0E0</color>
+
+
+    <!-- ================= EXTRA (BOTTOM SHEET) ================= -->
+
+    <color name="sheetBackground">#FFFFFF</color>
+    <color name="sheetHandle">#D1D5DB</color>
+
+</resources>

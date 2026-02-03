@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Solid Zomato Red Background -->
+    <solid android:color="#E23744"/>
+
+    <!-- Optional Darker Border -->
+    <stroke
+        android:width="1dp"
+        android:color="#C62828"/>
+
+    <!-- Rounded Corners -->
+    <corners android:radius="20dp"/>
+
+</shape>

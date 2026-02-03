@@ -1,0 +1,278 @@
+package com.example.messmateapp.ui.cart;
+
+import android.graphics.Rect;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.example.messmateapp.R;
+import com.example.messmateapp.data.model.RecommendationResponse;
+import com.example.messmateapp.domain.model.CartItem;
+
+import java.util.List;
+
+public class RecommendationAdapter
+        extends RecyclerView.Adapter<RecommendationAdapter.ViewHolder> {
+
+    private final List<RecommendationResponse.RecommendationItem> list;
+    private final Runnable onCartChanged;
+    private final android.content.Context context;
+
+
+
+    public RecommendationAdapter(
+            android.content.Context ctx,
+            List<RecommendationResponse.RecommendationItem> list,
+            Runnable onCartChanged
+    ) {
+        this.context = ctx;   // ✅ SAVE CONTEXT
+        this.list = list;
+        this.onCartChanged = onCartChanged;
+    }
+
+
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(
+            @NonNull ViewGroup parent,
+            int viewType
+    ) {
+
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_recommendation, parent, false);
+
+        return new ViewHolder(v);
+    }
+
+
+    @Override
+    public void onBindViewHolder(
+            @NonNull ViewHolder h,
+            int position
+    ) {
+
+        RecommendationResponse.RecommendationItem item =
+                list.get(position);
+
+
+        /* ================= DATA ================= */
+
+        h.name.setText(item.name);
+        h.price.setText("₹" + item.price);
+
+        Glide.with(h.image.getContext())
+                .load(item.image)
+                .placeholder(R.drawable.placeholder)
+                .centerCrop()
+                .into(h.image);
+
+
+        /* ================= CART QTY ================= */
+
+        int qty = CartManager.getItemQty(item.name);
+
+        if (qty > 0) {
+
+            h.btnAdd.setVisibility(View.GONE);
+            h.layoutQty.setVisibility(View.VISIBLE);
+
+            h.tvQty.setText(String.valueOf(qty));
+
+        } else {
+
+            h.btnAdd.setVisibility(View.VISIBLE);
+            h.layoutQty.setVisibility(View.GONE);
+        }
+
+
+        /* ================= ADD (FLY ANIM) ================= */
+
+        h.btnAdd.setOnClickListener(v -> {
+
+            boolean added = CartManager.addItem(
+                    new CartItem(
+                            item.name,
+                            item.name,
+                            item.price,
+                            1,
+                            item.image,
+                            item.type,
+                            item.category
+                    ),
+                    context   // ✅ PASS CONTEXT
+            );
+
+
+            if (!added) {
+
+                Toast.makeText(
+                        v.getContext(),
+                        "Max limit reached",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+
+            // 🔥 Fly animation
+            startFlyAnimation(h.image, () -> {
+
+                if (onCartChanged != null) {
+                    onCartChanged.run();
+                }
+            });
+        });
+
+
+        /* ================= PLUS ================= */
+
+        h.btnPlus.setOnClickListener(v -> {
+
+            boolean inc = CartManager.increase(item.name, context);
+
+
+            if (!inc) return;
+
+            int pos = h.getBindingAdapterPosition();
+
+            if (pos != RecyclerView.NO_POSITION) {
+                notifyItemChanged(pos);
+            }
+
+            if (onCartChanged != null) {
+                onCartChanged.run();
+            }
+        });
+
+
+        /* ================= MINUS ================= */
+
+        h.btnMinus.setOnClickListener(v -> {
+
+            boolean inc = CartManager.increase(item.name, context);
+
+
+            int pos = h.getBindingAdapterPosition();
+
+            if (pos != RecyclerView.NO_POSITION) {
+                notifyItemChanged(pos);
+            }
+
+            if (onCartChanged != null) {
+                onCartChanged.run();
+            }
+        });
+    }
+
+
+    /* ================= FLY ANIMATION ================= */
+
+    private void startFlyAnimation(ImageView image, Runnable onEnd) {
+
+        if (image == null) {
+            if (onEnd != null) onEnd.run();
+            return;
+        }
+
+        View root = image.getRootView();
+
+
+        Rect start = new Rect();
+        Rect end = new Rect();
+
+
+        image.getGlobalVisibleRect(start);
+
+        // Cart bottom-right target
+        root.getGlobalVisibleRect(end);
+
+
+        float dx = end.right - start.centerX();
+        float dy = end.bottom - start.centerY();
+
+
+        image.bringToFront();
+
+
+        ViewPropertyAnimator animator =
+                image.animate()
+                        .translationXBy(dx)
+                        .translationYBy(dy)
+                        .scaleX(0.2f)
+                        .scaleY(0.2f)
+                        .alpha(0f)
+                        .setDuration(500);
+
+
+        animator.withEndAction(() -> {
+
+            // Reset
+            image.setTranslationX(0f);
+            image.setTranslationY(0f);
+            image.setScaleX(1f);
+            image.setScaleY(1f);
+            image.setAlpha(1f);
+
+
+            if (onEnd != null) {
+                onEnd.run();
+            }
+        });
+
+        animator.start();
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return list.size();
+    }
+
+
+    /* ================= HOLDER ================= */
+
+    static class ViewHolder
+            extends RecyclerView.ViewHolder {
+
+        ImageView image;
+
+        TextView name, price, tvQty;
+
+        LinearLayout btnAdd;
+
+        LinearLayout layoutQty;
+
+        TextView btnPlus, btnMinus;
+
+
+        ViewHolder(@NonNull View v) {
+
+            super(v);
+
+            image = v.findViewById(R.id.imgFood);
+
+            name = v.findViewById(R.id.tvName);
+            price = v.findViewById(R.id.tvPrice);
+
+            btnAdd = v.findViewById(R.id.btnAdd);
+
+            layoutQty = v.findViewById(R.id.layoutQty);
+
+            tvQty = v.findViewById(R.id.tvQty);
+
+            btnPlus = v.findViewById(R.id.btnPlus);
+            btnMinus = v.findViewById(R.id.btnMinus);
+        }
+    }
+}

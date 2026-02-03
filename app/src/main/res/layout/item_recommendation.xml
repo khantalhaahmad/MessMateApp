@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="140dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+
+    android:clickable="false"
+    android:focusable="false"
+
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+
+        <!-- IMAGE + ADD -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="95dp">
+
+
+            <!-- FOOD IMAGE -->
+            <ImageView
+                android:id="@+id/imgFood"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="#EEEEEE"/>
+
+
+            <!-- ADD BUTTON (ZOMATO STYLE) -->
+            <LinearLayout
+                android:id="@+id/btnAdd"
+                android:layout_width="60dp"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="6dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_add_zomato"
+                android:clickable="true"
+                android:focusable="true"
+                android:elevation="3dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp">
+
+
+                <!-- ADD TEXT -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ADD"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#E23744"/>
+
+
+                <!-- YOUR ic_plus.png -->
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="3dp"
+                    android:src="@drawable/ic_plus"
+                    android:tint="#E23744"/>
+
+            </LinearLayout>
+
+
+            <!-- QTY -->
+            <LinearLayout
+                android:id="@+id/layoutQty"
+                android:layout_width="75dp"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="6dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone"
+                android:background="@drawable/bg_qty_rounded"
+                android:elevation="3dp">
+
+
+                <TextView
+                    android:id="@+id/btnMinus"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="#E23744"/>
+
+
+                <TextView
+                    android:id="@+id/tvQty"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="1"
+                    android:gravity="center"
+                    android:textStyle="bold"/>
+
+
+                <TextView
+                    android:id="@+id/btnPlus"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="+"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="#E23744"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+
+        <!-- NAME -->
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Item Name"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"/>
+
+
+        <!-- PRICE -->
+        <TextView
+            android:id="@+id/tvPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="₹120"
+            android:textSize="12sp"
+            android:textColor="#444444"/>
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

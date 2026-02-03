@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutBillDelivery"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical">
+
+
+    <!-- Delivery Icon -->
+    <ImageView
+        android:id="@+id/imgDelivery"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/ic_delivery"
+        android:tint="#6B7280" />
+
+
+    <!-- Text Area -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+
+        <!-- Time -->
+        <TextView
+            android:id="@+id/tvDeliveryTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delivery in 40-45 mins"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:textColor="#111827"/>
+
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvDeliveryNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fast &amp; safe delivery"
+            android:textSize="13sp"
+            android:textColor="#6B7280"/>
+
+    </LinearLayout>
+
+</LinearLayout>
