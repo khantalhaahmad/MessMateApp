@@ -40,10 +40,19 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
 
     private final Context context;
 
-    public MenuAdapter(Context context, OnCartChanged cartChanged) {
+    public MenuAdapter(
+            Context context,
+            String messId,
+            String messName,
+            OnCartChanged listener
+    ) {
+
         this.context = context;
-        this.cartChanged = cartChanged;
+        this.messId = messId;
+        this.messName = messName;
+        this.cartChanged = listener;
     }
+
 
 
 
@@ -57,6 +66,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
     // Full backup list
     private final List<MenuItemDto> fullList = new ArrayList<>();
 
+    private String messId;
+    private String messName;
 
     /* ==========================
        SUBMIT LIST
@@ -265,6 +276,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
         h.btnAdd.setOnClickListener(v -> {
 
             boolean added = CartManager.addItem(
+
                     new CartItem(
                             item.getId(),
                             item.getName(),
@@ -272,10 +284,14 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
                             1,
                             item.getImage(),
                             item.isVeg() ? "veg" : "non-veg",
-                            "other"
+                            "other",
+                            messId,     // ✅ Restaurant ID
+                            messName    // ✅ Restaurant Name
                     ),
-                    context   // ✅ use this
+
+                    context   // ✅ Context yahin hona chahiye
             );
+
 
 
 

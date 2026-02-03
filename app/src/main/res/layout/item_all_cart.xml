@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -8,33 +9,47 @@
     android:background="@drawable/circle_gray"
     android:layout_marginBottom="8dp">
 
+
+    <!-- Left Info -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
 
+
+        <!-- ✅ Restaurant Name (Set Dynamically) -->
         <TextView
             android:id="@+id/tvResName"
-            android:text="Restaurant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
             android:textStyle="bold"
             android:textSize="15sp"/>
 
+
         <TextView
             android:id="@+id/tvItemCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="2 items"
             android:textColor="@color/textSecondary"/>
+
     </LinearLayout>
 
 
+    <!-- View Cart Button -->
     <TextView
         android:id="@+id/btnViewCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="View Cart"
         android:textColor="@color/primary"
         android:textStyle="bold"
         android:padding="6dp"/>
 
 
+    <!-- Close -->
     <ImageView
         android:id="@+id/btnClose"
         android:layout_width="22dp"

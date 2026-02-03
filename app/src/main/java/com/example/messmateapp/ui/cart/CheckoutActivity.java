@@ -105,7 +105,9 @@ public class CheckoutActivity extends AppCompatActivity
         initIntent();
 
 // 🔥 IMPORTANT: Set current restaurant cart (with context)
-        CartManager.setRestaurant(messId, this);
+        CartManager.setRestaurant(messId, messName, this);
+
+
 
         initViews();
 
@@ -284,8 +286,11 @@ public class CheckoutActivity extends AppCompatActivity
                 new RecommendationAdapter(
                         this,
                         recommendList,
+                        messId,        // ✅ pass restaurant id
+                        messName,      // ✅ pass restaurant name
                         this::refreshAll
                 );
+
 
         rvRecommend.setAdapter(recommendationAdapter);
     }

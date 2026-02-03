@@ -92,7 +92,8 @@ public class MenuActivity extends AppCompatActivity {
         initIntent();
 
 // 🔥 IMPORTANT: Set current restaurant cart (with context)
-        CartManager.setRestaurant(messId, this);
+        CartManager.setRestaurant(messId, messName, this);
+
 
 
         initViews();
@@ -114,7 +115,8 @@ public class MenuActivity extends AppCompatActivity {
         super.onResume();
 
         // Ensure correct restaurant is active
-        CartManager.setRestaurant(messId, this);
+        CartManager.setRestaurant(messId, messName, this);
+
 
         // Sync cart after checkout
         CartManager.sync(this);
@@ -197,7 +199,13 @@ public class MenuActivity extends AppCompatActivity {
 
         /* ================= Adapter ================= */
 
-        adapter = new MenuAdapter(this, this::updateCartBar);
+        adapter = new MenuAdapter(
+                this,
+                messId,
+                messName,
+                this::updateCartBar
+        );
+
 
 
         rvMenu.setLayoutManager(new LinearLayoutManager(this));

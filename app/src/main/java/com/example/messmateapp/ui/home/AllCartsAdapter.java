@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.messmateapp.R;
 import com.example.messmateapp.ui.cart.CartManager;
 import com.example.messmateapp.ui.menu.MenuActivity;
+import android.util.Log;
 
 import java.util.List;
 
@@ -47,7 +48,13 @@ public class AllCartsAdapter
 
         int count = CartManager.getTotalItemsFor(resId);
 
-        h.tvName.setText("Restaurant " + resId);
+        // ✅ Get real restaurant name
+        String resName = CartManager.getRestaurantName(resId);
+
+        Log.d("CART_DEBUG", "GET -> id=" + resId + " name=" + resName);
+
+        h.tvName.setText(resName);
+
         h.tvCount.setText(count + " item(s)");
 
         h.btnView.setOnClickListener(v -> {

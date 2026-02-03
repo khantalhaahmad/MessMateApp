@@ -31,10 +31,12 @@ import com.example.messmateapp.domain.usecase.GetRestaurantsUseCase;
 import com.example.messmateapp.ui.profile.ProfileActivity;
 import com.example.messmateapp.utils.Resource;
 import com.example.messmateapp.ui.cart.CartManager;
-import com.google.android.material.snackbar.Snackbar;
 import com.example.messmateapp.ui.cart.CheckoutActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.util.Log;
+import android.widget.FrameLayout;
+import android.view.ViewGroup;
+
 
 
 import java.util.ArrayList;
@@ -65,6 +67,8 @@ public class HomeActivity extends AppCompatActivity {
     private Runnable pendingRunnable;
 
     private TextView btnAllCarts;
+    private FrameLayout popupContainer;
+
 
 
     // ================= ZOMATO STYLE FOOD NAMES =================
@@ -99,6 +103,7 @@ public class HomeActivity extends AppCompatActivity {
         setupSearchHintSwitcher();
 
         updateAllCartsButton(); // ✅ ADD THIS
+        setupAllCartsClick(); // ✅ ADD THIS
     }
 
 
@@ -135,10 +140,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void bringAllCartsToFront() {
         if (btnAllCarts != null) {
+
             btnAllCarts.bringToFront();
-            btnAllCarts.setElevation(20f); // Android 5+ ke liye
+
+            btnAllCarts.setZ(100f); // Android 9+
+            btnAllCarts.setElevation(50f); // Old Android
+
+            btnAllCarts.invalidate();
+            btnAllCarts.requestLayout();
         }
     }
+
 
 
     // ================= INIT =================
@@ -155,6 +167,8 @@ public class HomeActivity extends AppCompatActivity {
 
         imgProfile = findViewById(R.id.imgProfile);
         btnAllCarts = findViewById(R.id.btnAllCarts); // ✅ ADD
+        popupContainer = findViewById(R.id.popupContainer);
+
 
     }
 
@@ -525,11 +539,16 @@ public class HomeActivity extends AppCompatActivity {
 
     private void showStackedPopup(String resId, int count) {
 
-        View root = findViewById(android.R.id.content);
+        if (popupContainer == null) return;
+
+        // Clear old popup
+        popupContainer.removeAllViews();
+        popupContainer.setVisibility(View.VISIBLE);
+
 
         View popup =
                 getLayoutInflater()
-                        .inflate(R.layout.view_resume_cart, null);
+                        .inflate(R.layout.view_resume_cart, popupContainer, false);
 
 
         TextView tvName = popup.findViewById(R.id.tvRestaurantName);
@@ -541,60 +560,75 @@ public class HomeActivity extends AppCompatActivity {
         ImageView btnClose = popup.findViewById(R.id.btnClose);
 
 
-        tvName.setText("Your Cart");
+        String resName = CartManager.getRestaurantName(resId);
+
+        tvName.setText(resName);
         tvCount.setText(count + " items in cart");
 
 
-        Snackbar snackbar =
-                Snackbar.make(root, "", Snackbar.LENGTH_INDEFINITE);
 
-        Snackbar.SnackbarLayout layout =
-                (Snackbar.SnackbarLayout) snackbar.getView();
-
-        layout.setBackgroundColor(
-                getResources().getColor(android.R.color.transparent));
-
-        layout.removeAllViews();
-        layout.addView(popup);
+        popupContainer.addView(popup);
 
 
         // VIEW CART
         btnCart.setOnClickListener(v -> {
 
-            Intent i =
-                    new Intent(this, CheckoutActivity.class);
-
+            Intent i = new Intent(this, CheckoutActivity.class);
             i.putExtra("RESTAURANT_ID", resId);
 
             startActivity(i);
 
-            snackbar.dismiss();
+            hidePopup();
         });
 
 
         // MENU
         btnMenu.setOnClickListener(v -> {
 
-            Intent i =
-                    new Intent(this,
-                            com.example.messmateapp.ui.menu.MenuActivity.class);
+            Intent i = new Intent(
+                    this,
+                    com.example.messmateapp.ui.menu.MenuActivity.class);
 
             i.putExtra("RESTAURANT_ID", resId);
 
             startActivity(i);
 
-            snackbar.dismiss();
+            hidePopup();
         });
 
 
         // CLOSE
-        btnClose.setOnClickListener(v -> snackbar.dismiss());
+        btnClose.setOnClickListener(v -> hidePopup());
 
 
-        snackbar.show();
+        // 🔥 Keep button on top
+        bringAllCartsToFront();
+    }
 
-        bringAllCartsToFront(); // ✅ ADD THIS
 
+
+    private void hidePopup() {
+
+        if (popupContainer != null) {
+
+            popupContainer.removeAllViews();
+            popupContainer.setVisibility(View.GONE);
+        }
+    }
+
+    // ================= ALL CARTS CLICK =================
+    private void setupAllCartsClick() {
+
+        if (btnAllCarts == null) return;
+
+        btnAllCarts.setOnClickListener(v -> {
+
+            // ❌ OLD redirect disable
+            // startActivity(...)
+
+            // ✅ Zomato style bottom sheet
+            showAllCartsBottomSheet();
+        });
     }
 
 

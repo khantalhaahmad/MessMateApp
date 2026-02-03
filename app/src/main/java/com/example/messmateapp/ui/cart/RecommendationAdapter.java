@@ -17,6 +17,8 @@ import com.bumptech.glide.Glide;
 import com.example.messmateapp.R;
 import com.example.messmateapp.data.model.RecommendationResponse;
 import com.example.messmateapp.domain.model.CartItem;
+import android.content.Context;
+import android.util.Log;
 
 import java.util.List;
 
@@ -27,15 +29,28 @@ public class RecommendationAdapter
     private final Runnable onCartChanged;
     private final android.content.Context context;
 
-
+    private String messId = "";
+    private String messName = "";
 
     public RecommendationAdapter(
-            android.content.Context ctx,
+            Context ctx,
             List<RecommendationResponse.RecommendationItem> list,
+            String messId,
+            String messName,
             Runnable onCartChanged
     ) {
-        this.context = ctx;   // ✅ SAVE CONTEXT
+        this.context = ctx;
         this.list = list;
+
+        // ✅ Use passed values if available
+        if (messId != null && !messId.isEmpty()) {
+            this.messId = messId;
+        }
+
+        if (messName != null && !messName.isEmpty()) {
+            this.messName = messName;
+        }
+
         this.onCartChanged = onCartChanged;
     }
 
@@ -64,6 +79,14 @@ public class RecommendationAdapter
         RecommendationResponse.RecommendationItem item =
                 list.get(position);
 
+// ✅ Fallback from API if not set
+        if ((messId == null || messId.isEmpty()) && item.mess_id != null) {
+            messId = item.mess_id;
+        }
+
+        if ((messName == null || messName.isEmpty()) && item.mess_name != null) {
+            messName = item.mess_name;
+        }
 
         /* ================= DATA ================= */
 
@@ -99,19 +122,31 @@ public class RecommendationAdapter
 
         h.btnAdd.setOnClickListener(v -> {
 
+            // ✅ SAVE RESTAURANT BEFORE ADDING
+            CartManager.setRestaurant(
+                    messId,
+                    messName,
+                    context
+            );
+
+            Log.d("CART_DEBUG",
+                    "SET -> id=" + messId + " name=" + messName);
+
+            // 🔥 THEN add item
             boolean added = CartManager.addItem(
                     new CartItem(
-                            item.name,
+                            item.mess_id,   // ya item.id
                             item.name,
                             item.price,
                             1,
                             item.image,
                             item.type,
-                            item.category
+                            item.category,
+                            messId,
+                            messName
                     ),
-                    context   // ✅ PASS CONTEXT
+                    context
             );
-
 
             if (!added) {
 
@@ -124,7 +159,6 @@ public class RecommendationAdapter
                 return;
             }
 
-
             // 🔥 Fly animation
             startFlyAnimation(h.image, () -> {
 
@@ -133,7 +167,6 @@ public class RecommendationAdapter
                 }
             });
         });
-
 
         /* ================= PLUS ================= */
 

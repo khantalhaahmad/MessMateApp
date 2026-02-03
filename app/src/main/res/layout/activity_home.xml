@@ -237,34 +237,11 @@
     </androidx.core.widget.NestedScrollView>
 
 
-    <TextView
-        android:id="@+id/btnAllCarts"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:background="@drawable/bg_all_carts"
-        android:text="All Carts (2)"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:visibility="gone"
-        android:elevation="20dp"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="90dp"/>
-
-
-
-
     <!-- ================= RESUME CART BAR ================= -->
 
     <LinearLayout
         android:id="@+id/layoutResumeCart"
-        android:elevation="6dp"
+        android:elevation="1dp"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:background="@color/primary"
@@ -297,7 +274,6 @@
             android:padding="8dp"/>
 
 
-
         <ImageView
             android:id="@+id/btnResumeClose"
             android:layout_width="24dp"
@@ -306,6 +282,51 @@
             android:padding="4dp"/>
 
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/btnAllCarts"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:background="@drawable/bg_all_carts"
+        android:text="All Carts (2)"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:visibility="gone"
+
+        android:elevation="80dp"
+        android:translationZ="80dp"
+        android:layout_marginBottom="12dp"
+        android:translationY="-70dp"
+
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layoutResumeCart"/>
+
+    <!-- ================= POPUP OVERLAY LAYER ================= -->
+
+    <FrameLayout
+        android:id="@+id/popupContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="bottom"
+        android:elevation="30dp"
+        android:translationZ="30dp"
+
+        android:clickable="false"
+        android:focusable="false"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

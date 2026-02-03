@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.util.Log;
 
 public class CartManager {
 
@@ -20,6 +21,10 @@ public class CartManager {
        ========================== */
 
     private static final Map<String, List<CartItem>> cartMap =
+            new HashMap<>();
+
+    // ✅ Store Restaurant Names
+    private static final Map<String, String> restaurantNames =
             new HashMap<>();
 
     private static String currentRestaurantId = "";
@@ -33,6 +38,7 @@ public class CartManager {
     private static final String KEY_CART = "CART_DATA";
     private static final String KEY_LAST_RESTAURANT = "LAST_RESTAURANT";
 
+    private static final String KEY_RESTAURANT_NAMES = "RESTAURANT_NAMES";
 
     // 🔥 HARD LIMIT
     public static final int MAX_QTY_PER_ITEM = 5;
@@ -42,9 +48,15 @@ public class CartManager {
        🏪 SET RESTAURANT
        ========================== */
 
-    public static synchronized void setRestaurant(String resId, Context ctx) {
+    public static synchronized void setRestaurant(
+            String resId,
+            String resName,
+            Context ctx
+    ) {
 
-        if (resId == null || resId.isEmpty() || ctx == null) return;
+        if (resId == null || resId.isEmpty()
+                || resName == null || resName.isEmpty()
+                || ctx == null) return;
 
         // Load all carts first
         loadFromStorage(ctx);
@@ -56,8 +68,15 @@ public class CartManager {
             cartMap.put(resId, new ArrayList<>());
         }
 
+        // ✅ Save restaurant name
+        restaurantNames.put(resId, resName);
+
+        Log.d("CART_DEBUG", "SET -> id=" + resId + " name=" + resName);
+
         saveLastRestaurant(ctx);
+
     }
+
 
     /* ==========================
        📌 LAST RESTAURANT
@@ -82,6 +101,14 @@ public class CartManager {
                 .getString(KEY_LAST_RESTAURANT, "");
     }
 
+
+    // ✅ Get Restaurant Name by ID
+    public static String getRestaurantName(String resId) {
+
+        if (resId == null) return "Restaurant";
+
+        return restaurantNames.getOrDefault(resId, "Restaurant");
+    }
 
     /* ==========================
        📦 CURRENT CART
@@ -115,9 +142,11 @@ public class CartManager {
         Gson gson = new Gson();
 
         String json = gson.toJson(cartMap);
+        String namesJson = gson.toJson(restaurantNames);
 
         pref.edit()
                 .putString(KEY_CART, json)
+                .putString(KEY_RESTAURANT_NAMES, namesJson) // ✅
                 .apply();
     }
 
@@ -135,6 +164,8 @@ public class CartManager {
                 ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
         String json = pref.getString(KEY_CART, null);
+            String namesJson =
+                    pref.getString(KEY_RESTAURANT_NAMES, null);
 
         if (json == null || json.isEmpty()) return;
 
@@ -153,6 +184,43 @@ public class CartManager {
                 cartMap.clear();
                 cartMap.putAll(saved);
 
+                // ✅ Restore restaurant names
+                if (namesJson != null && !namesJson.isEmpty()) {
+
+                    Type nameType =
+                            new TypeToken<Map<String, String>>() {}.getType();
+
+                    Map<String, String> names =
+                            gson.fromJson(namesJson, nameType);
+
+                    if (names != null) {
+
+                        restaurantNames.clear();
+                        restaurantNames.putAll(names);
+                    }
+                }
+
+
+
+                // ✅ Restore restaurant names from items (fallback)
+                for (Map.Entry<String, List<CartItem>> entry : saved.entrySet()) {
+
+                    List<CartItem> list = entry.getValue();
+
+                    if (list != null && !list.isEmpty()) {
+
+                        CartItem first = list.get(0);
+
+                        if (first.getRestaurantName() != null) {
+
+                            restaurantNames.put(
+                                    entry.getKey(),
+                                    first.getRestaurantName()
+                            );
+                        }
+                    }
+                }
+
                 // ❌ yahan currentRestaurantId set mat karo
             }
 
@@ -161,6 +229,8 @@ public class CartManager {
             e.printStackTrace();
         }
     }
+
+
 
     /* ==========================
        ➕ ADD
