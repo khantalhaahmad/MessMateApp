@@ -36,7 +36,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.util.Log;
 import android.widget.FrameLayout;
 import android.view.ViewGroup;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import android.location.Address;
+import android.location.Geocoder;
 
+import com.example.messmateapp.utils.SessionManager;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import java.util.List;
 
 
 import java.util.ArrayList;
@@ -69,6 +78,11 @@ public class HomeActivity extends AppCompatActivity {
     private TextView btnAllCarts;
     private FrameLayout popupContainer;
 
+    private TextView tvLocation;
+
+    private SessionManager session;
+
+    private FusedLocationProviderClient locationClient;
 
 
     // ================= ZOMATO STYLE FOOD NAMES =================
@@ -102,26 +116,40 @@ public class HomeActivity extends AppCompatActivity {
         setupProfileClick();
         setupSearchHintSwitcher();
 
-        updateAllCartsButton(); // ✅ ADD THIS
-        setupAllCartsClick(); // ✅ ADD THIS
+        // 🔥 LOCATION SETUP
+        setupLocation();
+
+        updateAllCartsButton();
+        setupAllCartsClick();
     }
-
-
     @Override
     protected void onResume() {
         super.onResume();
+
+        // 🔥 Refresh saved location
+        if (session != null && tvLocation != null) {
+
+            String saved = session.getAddress();
+
+            if (saved != null) {
+                tvLocation.setText(saved);
+            }
+        }
+
+
+        // ================= CART =================
 
         CartManager.loadFromStorage(this);
 
         updateAllCartsButton();
 
-        bringAllCartsToFront(); // ✅ ADD THIS
+        bringAllCartsToFront();
+
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             showAllCartPopups();
         }, 200);
     }
-
     private void updateAllCartsButton() {
 
         Log.d("CART_DEBUG",
@@ -166,10 +194,19 @@ public class HomeActivity extends AppCompatActivity {
         emptyState = findViewById(R.id.layoutEmptyState);
 
         imgProfile = findViewById(R.id.imgProfile);
-        btnAllCarts = findViewById(R.id.btnAllCarts); // ✅ ADD
+
+        // 🔥 LOCATION TEXT
+        tvLocation = findViewById(R.id.tvLocation);
+
+        btnAllCarts = findViewById(R.id.btnAllCarts);
         popupContainer = findViewById(R.id.popupContainer);
 
 
+        // 🔥 SESSION + LOCATION CLIENT
+        session = new SessionManager(this);
+
+        locationClient =
+                LocationServices.getFusedLocationProviderClient(this);
     }
 
 
@@ -576,7 +613,7 @@ public class HomeActivity extends AppCompatActivity {
             Intent i = new Intent(this, CheckoutActivity.class);
             i.putExtra("RESTAURANT_ID", resId);
 
-            startActivity(i);
+            startActivityForResult(i, 2001);
 
             hidePopup();
         });
@@ -631,6 +668,117 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    // ================= LOCATION =================
+
+    private void setupLocation() {
+
+        // 1️⃣ Check saved address first
+        String saved = session.getAddress();
+
+        if (saved != null) {
+
+            tvLocation.setText(saved);
+            return;
+        }
+
+        // 2️⃣ Else get GPS
+        fetchCurrentLocation();
+
+
+        // 3️⃣ Click → Open Map
+        tvLocation.setOnClickListener(v -> {
+
+            Intent i = new Intent(
+                    this,
+                    com.example.messmateapp.ui.address.MapPickerActivity.class
+            );
+
+            startActivityForResult(i, 2001);
+        });
+    }
+
+
+    private void fetchCurrentLocation() {
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    },
+                    111
+            );
+
+            return;
+        }
+
+        locationClient.getLastLocation()
+                .addOnSuccessListener(loc -> {
+
+                    if (loc == null) return;
+
+                    double lat = loc.getLatitude();
+                    double lng = loc.getLongitude();
+
+                    getAddress(lat, lng);
+                });
+    }
+
+
+    private void getAddress(double lat, double lng) {
+
+        try {
+
+            Geocoder geo =
+                    new Geocoder(this, Locale.getDefault());
+
+            List<Address> list =
+                    geo.getFromLocation(lat, lng, 1);
+
+            if (!list.isEmpty()) {
+
+                Address a = list.get(0);
+
+                String area = a.getSubLocality();
+                String city = a.getLocality();
+
+                String text;
+
+                if (area != null)
+                    text = area + ", " + city;
+                else
+                    text = city;
+
+                tvLocation.setText(text);
+
+                session.saveLocation(text, lat, lng);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ================= MAP RESULT =================
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 2001 && resultCode == RESULT_OK) {
+
+            // 🔥 Reload saved location
+            String address = session.getAddress();
+
+            if (address != null) {
+                tvLocation.setText(address);
+            }
+        }
+    }
 
     // ================= CLEANUP =================
     @Override

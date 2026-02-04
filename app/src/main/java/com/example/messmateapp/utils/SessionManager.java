@@ -97,4 +97,35 @@ public class SessionManager {
 
         return pref.getString(KEY_MOBILE, null);
     }
+
+    // ================= LOCATION =================
+
+    private static final String KEY_ADDRESS = "delivery_address";
+    private static final String KEY_LAT = "lat";
+    private static final String KEY_LNG = "lng";
+
+
+    public void saveLocation(String address, double lat, double lng) {
+
+        editor.putString(KEY_ADDRESS, address);
+        editor.putFloat(KEY_LAT, (float) lat);
+        editor.putFloat(KEY_LNG, (float) lng);
+
+        editor.apply();
+    }
+
+
+    public String getAddress() {
+        return pref.getString(KEY_ADDRESS, null);
+    }
+
+
+    public double getLat() {
+        return pref.getFloat(KEY_LAT, 0);
+    }
+
+
+    public double getLng() {
+        return pref.getFloat(KEY_LNG, 0);
+    }
 }

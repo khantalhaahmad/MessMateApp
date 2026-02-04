@@ -28,6 +28,7 @@
         android:name=".utils.AppContext"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup,android:usesCleartextTraffic"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -131,6 +132,16 @@
             android:exported="false"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.address.AddAddressActivity" />
+
+
+        <!-- ================= RAZORPAY CHECKOUT ================= -->
+
+        <activity
+            android:name="com.razorpay.CheckoutActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="false"
+            tools:replace="android:exported,android:theme" />
+
 
 
     </application>

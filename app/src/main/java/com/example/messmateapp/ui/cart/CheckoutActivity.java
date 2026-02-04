@@ -29,11 +29,22 @@ import com.example.messmateapp.ui.menu.MenuActivity;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.example.messmateapp.data.model.CreateOrderResponse;
+import com.example.messmateapp.data.model.VerifyResponse;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import com.razorpay.Checkout;
+import com.razorpay.PaymentResultListener;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,7 +53,9 @@ import retrofit2.Response;
 
 
 public class CheckoutActivity extends AppCompatActivity
-        implements AddressBottomSheetAdapter.OnAddressSelectListener {
+        implements AddressBottomSheetAdapter.OnAddressSelectListener,
+        PaymentResultListener {
+
 
 
     /* ================= UI ================= */
@@ -60,9 +73,11 @@ public class CheckoutActivity extends AppCompatActivity
     private TextView tvBillPhone;
 
     private TextView tvAddress;
-    private TextView tvChangeAddress; // ✅ NEW
+    private TextView tvChangeAddress;
 
-
+    // ✅ Payment
+    private RadioGroup rgPayment;
+    private RadioButton rbOnline, rbCOD;
 
 
     /* ================= Adapter ================= */
@@ -75,6 +90,7 @@ public class CheckoutActivity extends AppCompatActivity
 
     private String messId = "";
     private String messName = "";
+    private String messImage = ""; // ✅
 
     private int finalGrandTotal = 0;
 
@@ -105,9 +121,12 @@ public class CheckoutActivity extends AppCompatActivity
         initIntent();
 
 // 🔥 IMPORTANT: Set current restaurant cart (with context)
-        CartManager.setRestaurant(messId, messName, this);
-
-
+        CartManager.setRestaurant(
+                messId,
+                messName,
+                messImage,   // ✅ ADD THIS
+                this
+        );
 
         initViews();
 
@@ -141,6 +160,9 @@ public class CheckoutActivity extends AppCompatActivity
 
             messId = getIntent().getStringExtra("RESTAURANT_ID");
             messName = getIntent().getStringExtra("RESTAURANT_NAME");
+            messImage = getIntent().getStringExtra("RESTAURANT_IMAGE");
+
+            if (messImage == null) messImage = "";
 
             if (messId == null) messId = "";
             if (messName == null) messName = "";
@@ -168,6 +190,17 @@ public class CheckoutActivity extends AppCompatActivity
         tvChangeAddress = findViewById(R.id.tvChangeAddress); // ✅ IMPORTANT
 
 
+        // ✅ Payment Options (ADD THIS)
+        rgPayment = findViewById(R.id.rgPayment);
+        rbOnline = findViewById(R.id.rbOnline);
+        rbCOD = findViewById(R.id.rbCOD);
+
+        // Default = Online
+        if (rbOnline != null) {
+            rbOnline.setChecked(true);
+        }
+
+
         View card = findViewById(R.id.cardTotalBill);
 
         layoutTotalBill = card.findViewById(R.id.layoutTotalBill);
@@ -191,6 +224,7 @@ public class CheckoutActivity extends AppCompatActivity
             tvChangeAddress.setOnClickListener(v -> openAddressBottomSheet());
         }
     }
+
 
 
 
@@ -322,7 +356,6 @@ public class CheckoutActivity extends AppCompatActivity
         btnPlaceOrder.setOnClickListener(v -> {
 
             if (cartList.isEmpty()) {
-
                 Toast.makeText(this,
                         "Cart is empty",
                         Toast.LENGTH_SHORT).show();
@@ -330,15 +363,22 @@ public class CheckoutActivity extends AppCompatActivity
             }
 
             if (selectedAddress == null) {
-
                 Toast.makeText(this,
                         "Select address first",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            placeOrder();
+            if (rbCOD.isChecked()) {
+
+                placeOrderCOD();   // COD
+
+            } else {
+
+                startPaymentFlow(); // Razorpay
+            }
         });
+
 
 
         // ✅ Only BottomSheet (No Address Activity)
@@ -492,15 +532,8 @@ public class CheckoutActivity extends AppCompatActivity
         order.total_price = finalGrandTotal;
 
 
-        order.deliveryAddress =
-                selectedAddress.house + ", " +
-                        selectedAddress.area + ", " +
-                        selectedAddress.city + " - " +
-                        selectedAddress.pincode;
-
-
-        order.lat = selectedAddress.lat;
-        order.lng = selectedAddress.lng;
+        // ✅ Send full address object
+        order.deliveryAddress = selectedAddress;
 
 
         List<OrderRequestDto.CartItemDto> items =
@@ -523,6 +556,9 @@ public class CheckoutActivity extends AppCompatActivity
         }
 
         order.items = items;
+// ✅ Receiver Info
+        order.receiverName = getUserName();
+        order.receiverPhone = getUserPhone();
 
 
         // ✅ Observe API Result
@@ -651,6 +687,25 @@ public class CheckoutActivity extends AppCompatActivity
 
 
         dialog.show();
+    }
+
+    // ================= USER INFO =================
+
+    private String getUserName() {
+
+        SharedPreferences pref =
+                getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+
+        return pref.getString(KEY_NAME, "Guest");
+    }
+
+
+    private String getUserPhone() {
+
+        SharedPreferences pref =
+                getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+
+        return pref.getString(KEY_PHONE, "");
     }
 
     /* ================= Address Bottom Sheet ================= */
@@ -954,5 +1009,229 @@ public class CheckoutActivity extends AppCompatActivity
 
         dialog.show();
     }
+    /* ================= PAYMENT FLOW ================= */
 
+    private void startPaymentFlow() {
+
+        btnPlaceOrder.setEnabled(false);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("amount", finalGrandTotal);
+
+        ApiClient.getClient()
+                .create(ApiService.class)
+                .createOrder(body)
+                .enqueue(new Callback<CreateOrderResponse>() {
+
+                    @Override
+                    public void onResponse(Call<CreateOrderResponse> call,
+                                           Response<CreateOrderResponse> response) {
+
+                        btnPlaceOrder.setEnabled(true);
+
+                        if (response.isSuccessful()
+                                && response.body() != null
+                                && response.body().success) {
+
+                            openRazorpay(response.body());
+                        } else {
+
+                            Toast.makeText(
+                                    CheckoutActivity.this,
+                                    "Payment Init Failed",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CreateOrderResponse> call,
+                                          Throwable t) {
+
+                        btnPlaceOrder.setEnabled(true);
+
+                        Toast.makeText(
+                                CheckoutActivity.this,
+                                "Network Error",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+    }
+
+
+
+    private void openRazorpay(CreateOrderResponse res) {
+
+        Checkout checkout = new Checkout();
+        checkout.setKeyID(res.key);
+
+        try {
+
+            JSONObject options = new JSONObject();
+
+            options.put("name", "MessMate");
+            options.put("description", "Food Order Payment");
+            options.put("order_id", res.order.id);
+            options.put("currency", "INR");
+            options.put("amount", res.order.amount);
+
+            checkout.open(this, options);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            Toast.makeText(this,
+                    "Payment Error",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /* ================= PAYMENT CALLBACK ================= */
+
+    @Override
+    public void onPaymentSuccess(String paymentId) {
+
+        verifyPayment(paymentId);
+    }
+
+
+    @Override
+    public void onPaymentError(int code, String response) {
+
+        Toast.makeText(this,
+                "Payment Failed",
+                Toast.LENGTH_LONG).show();
+    }
+
+    private void verifyPayment(String paymentId) {
+
+        // Razorpay automatically sends orderId + signature
+        // You should get them via intent (advanced)
+        // For now backend will verify
+
+        Map<String, String> body = new HashMap<>();
+
+        body.put("razorpay_payment_id", paymentId);
+
+        ApiClient.getClient()
+                .create(ApiService.class)
+                .verifyPayment(body)
+                .enqueue(new Callback<VerifyResponse>() {
+
+                    @Override
+                    public void onResponse(Call<VerifyResponse> call,
+                                           Response<VerifyResponse> response) {
+
+                        if (response.isSuccessful()
+                                && response.body() != null
+                                && response.body().success) {
+
+                            // ✅ After payment → place order
+                            placeOrder();
+                        } else {
+
+                            Toast.makeText(
+                                    CheckoutActivity.this,
+                                    "Payment Verification Failed",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<VerifyResponse> call,
+                                          Throwable t) {
+
+                        Toast.makeText(
+                                CheckoutActivity.this,
+                                "Verify Error",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+    }
+    private void placeOrderCOD() {
+
+        btnPlaceOrder.setEnabled(false);
+
+        OrderRepositoryImpl repo =
+                new OrderRepositoryImpl(this);
+
+        OrderRequestDto order = new OrderRequestDto();
+
+        order.mess_id = messId;
+        order.mess_name = messName;
+
+        order.paymentMethod = "COD";
+
+        order.total_price = finalGrandTotal;
+
+        // ✅ Send full address object
+        order.deliveryAddress = selectedAddress;
+
+
+        List<OrderRequestDto.CartItemDto> items =
+                new ArrayList<>();
+
+        for (CartItem c : cartList) {
+
+            OrderRequestDto.CartItemDto dto =
+                    new OrderRequestDto.CartItemDto();
+
+            dto.name = c.getName();
+            dto.price = c.getPrice();
+            dto.quantity = c.getQuantity();
+
+            items.add(dto);
+        }
+
+        order.items = items;
+// ✅ Receiver Info
+        order.receiverName = getUserName();
+        order.receiverPhone = getUserPhone();
+
+
+        repo.placeOrder(order)
+                .observe(this, res -> {
+
+                    // ✅ IGNORE LOADING
+                    if (res.isLoading()) return;
+
+                    btnPlaceOrder.setEnabled(true);
+
+                    // ✅ SUCCESS
+                    if (res.isSuccess()) {
+
+                        Toast.makeText(
+                                this,
+                                "Order placed (COD)",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        CartManager.clear(this);
+
+                        finish();
+
+                    }
+
+                    // ❌ REAL ERROR
+                    else {
+
+                        String msg = res.getMessage();
+
+                        if (msg == null || msg.isEmpty()) {
+                            msg = "COD Failed";
+                        }
+
+                        Toast.makeText(
+                                this,
+                                msg,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                });
+    }
 }

@@ -123,11 +123,16 @@ public class RecommendationAdapter
         h.btnAdd.setOnClickListener(v -> {
 
             // ✅ SAVE RESTAURANT BEFORE ADDING
+            Log.d("CART_DEBUG", "BANNER = " + item.messImage);
+
             CartManager.setRestaurant(
                     messId,
                     messName,
+                    item.image,   // ✅ USE THIS
                     context
             );
+
+
 
             Log.d("CART_DEBUG",
                     "SET -> id=" + messId + " name=" + messName);

@@ -52,20 +52,24 @@ public class RestaurantAdapter
         Glide.with(context)
                 .load(restaurant.getBanner())
                 .placeholder(R.drawable.placeholder)
-                .centerCrop()
+                .circleCrop()   // 🔥 YAHI ADD
                 .into(holder.imgRestaurant);
+
 
         // ✅ FIXED CLICK → OPEN MENU
         holder.itemView.setOnClickListener(v -> {
 
             Intent intent = new Intent(context, MenuActivity.class);
 
-            // 🔥 SAME KEYS AS MenuActivity
             intent.putExtra("RESTAURANT_ID", restaurant.getId());
             intent.putExtra("RESTAURANT_NAME", restaurant.getName());
 
+            // 🔥 PASS BANNER IMAGE
+            intent.putExtra("RESTAURANT_IMAGE", restaurant.getBanner());
+
             context.startActivity(intent);
         });
+
     }
 
     @Override

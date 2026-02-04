@@ -1,5 +1,6 @@
 package com.example.messmateapp.data.model;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class RecommendationResponse {
@@ -16,7 +17,11 @@ public class RecommendationResponse {
 
         public String name;
 
-        public String image;
+        public String image;   // 🍔 Food image
+
+        // 🏠 Restaurant banner image (FROM BACKEND)
+        @SerializedName("mess_image")
+        public String messImage;
 
         public int price;
 

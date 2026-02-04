@@ -21,6 +21,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.location.Address;
+import android.location.Geocoder;
+
+import com.example.messmateapp.utils.SessionManager;
+
+import java.util.List;
+import java.util.Locale;
+
 
 public class MapPickerActivity extends AppCompatActivity
         implements OnMapReadyCallback {
@@ -65,16 +73,46 @@ public class MapPickerActivity extends AppCompatActivity
                 return;
             }
 
-            Intent i = new Intent();
+            String address = getAddressFromLatLng(lat, lng);
 
-            i.putExtra("lat", lat);
-            i.putExtra("lng", lng);
+            SessionManager session = new SessionManager(this);
 
-            setResult(RESULT_OK, i);
+            session.saveLocation(address, lat, lng);
+
+            setResult(RESULT_OK);
             finish();
         });
     }
 
+    private String getAddressFromLatLng(double lat, double lng) {
+
+        try {
+
+            Geocoder geo =
+                    new Geocoder(this, Locale.getDefault());
+
+            List<Address> list =
+                    geo.getFromLocation(lat, lng, 1);
+
+            if (!list.isEmpty()) {
+
+                Address a = list.get(0);
+
+                String area = a.getSubLocality();
+                String city = a.getLocality();
+
+                if (area != null)
+                    return area + ", " + city;
+
+                return city;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "Selected Location";
+    }
 
     /* ================= Map Ready ================= */
 

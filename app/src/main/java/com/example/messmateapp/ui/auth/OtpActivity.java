@@ -318,12 +318,18 @@ public class OtpActivity extends AppCompatActivity {
                                             && res.body() != null
                                             && res.body().isSuccess()) {
 
-                                        /* ✅ SAVE FULL LOGIN */
+                                        /* ✅ SAVE SESSION */
                                         session.saveLogin(
                                                 res.body().getToken(),
                                                 mobile
                                         );
 
+                                        /* ✅ SAVE FOR CHECKOUT PAGE (IMPORTANT) */
+                                        getSharedPreferences("USER_DATA", MODE_PRIVATE)
+                                                .edit()
+                                                .putString("USER_PHONE", "+91 " + mobile)
+                                                .putString("USER_NAME", "Guest") // or backend name if available
+                                                .apply();
 
                                         startActivity(
                                                 new Intent(

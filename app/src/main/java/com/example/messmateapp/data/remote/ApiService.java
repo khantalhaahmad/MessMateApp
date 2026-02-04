@@ -8,6 +8,8 @@ import com.example.messmateapp.data.model.MenuResponse;
 import com.example.messmateapp.data.model.OrderRequestDto;
 import com.example.messmateapp.data.model.RecommendationResponse;
 import com.example.messmateapp.data.model.RestaurantDto;
+import com.example.messmateapp.data.model.CreateOrderResponse;
+import com.example.messmateapp.data.model.VerifyResponse;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import java.util.Map;
 
 public interface ApiService {
 
@@ -70,6 +73,19 @@ public interface ApiService {
             @Body OrderRequestDto body
     );
 
+    /* ================= PAYMENT ================= */
+
+    // ✅ Create Razorpay Order
+    @POST("payment/create-order")
+    Call<CreateOrderResponse> createOrder(
+            @Body Map<String, Object> body
+    );
+
+    // ✅ Verify Razorpay Payment
+    @POST("payment/verify")
+    Call<VerifyResponse> verifyPayment(
+            @Body Map<String, String> body
+    );
 
     /* ================= ADDRESS (ZOMATO FLOW) ================= */
 

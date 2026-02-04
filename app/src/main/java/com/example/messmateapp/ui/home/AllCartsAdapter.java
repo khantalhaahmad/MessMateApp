@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide; // ✅ ADD
 import com.example.messmateapp.R;
 import com.example.messmateapp.ui.cart.CartManager;
 import com.example.messmateapp.ui.menu.MenuActivity;
@@ -51,17 +52,35 @@ public class AllCartsAdapter
         // ✅ Get real restaurant name
         String resName = CartManager.getRestaurantName(resId);
 
-        Log.d("CART_DEBUG", "GET -> id=" + resId + " name=" + resName);
+        // ✅ Get restaurant banner (ONLY ONCE)
+        final String resImage =
+                CartManager.getRestaurantImage(resId);
+
+        Log.d("CART_DEBUG",
+                "GET -> id=" + resId +
+                        " name=" + resName +
+                        " img=" + resImage);
 
         h.tvName.setText(resName);
 
         h.tvCount.setText(count + " item(s)");
+
+        // ✅ Load banner image
+        Glide.with(context)
+                .load(resImage)
+                .placeholder(R.drawable.placeholder) // loading time
+                .error(R.drawable.placeholder)       // error time
+                .circleCrop()
+                .into(h.imgRestaurant);
+
+
 
         h.btnView.setOnClickListener(v -> {
 
             Intent i = new Intent(context, MenuActivity.class);
 
             i.putExtra("RESTAURANT_ID", resId);
+            i.putExtra("RESTAURANT_IMAGE", resImage); // ✅ reuse
 
             context.startActivity(i);
         });
@@ -76,6 +95,7 @@ public class AllCartsAdapter
         });
     }
 
+
     @Override
     public int getItemCount() {
         return restaurantIds.size();
@@ -87,6 +107,9 @@ public class AllCartsAdapter
         TextView tvName, tvCount, btnView;
         ImageView btnClose;
 
+        // ✅ ADD restaurant image
+        ImageView imgRestaurant;
+
         VH(View v) {
             super(v);
 
@@ -94,6 +117,9 @@ public class AllCartsAdapter
             tvCount = v.findViewById(R.id.tvItemCount);
             btnView = v.findViewById(R.id.btnViewCart);
             btnClose = v.findViewById(R.id.btnClose);
+
+            // ✅ Bind image view
+            imgRestaurant = v.findViewById(R.id.imgRestaurant);
         }
     }
 }

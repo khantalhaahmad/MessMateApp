@@ -69,6 +69,7 @@ public class MenuActivity extends AppCompatActivity {
     private final Handler hintHandler = new Handler(Looper.getMainLooper());
     private Runnable hintRunnable;
     private int hintIndex = 0;
+    private String messImage = "";
 
     private final String[] menuHints = {
             "\"Chicken Biryani\" 🍗",
@@ -92,7 +93,13 @@ public class MenuActivity extends AppCompatActivity {
         initIntent();
 
 // 🔥 IMPORTANT: Set current restaurant cart (with context)
-        CartManager.setRestaurant(messId, messName, this);
+        CartManager.setRestaurant(
+                messId,
+                messName,
+                messImage,   // ✅ banner
+                this
+        );
+
 
 
 
@@ -115,7 +122,13 @@ public class MenuActivity extends AppCompatActivity {
         super.onResume();
 
         // Ensure correct restaurant is active
-        CartManager.setRestaurant(messId, messName, this);
+        CartManager.setRestaurant(
+                messId,
+                messName,
+                messImage,   // ✅ ADD IMAGE
+                this
+        );
+
 
 
         // Sync cart after checkout
@@ -136,10 +149,14 @@ public class MenuActivity extends AppCompatActivity {
 
     private void initIntent() {
 
+
+
+
         if (getIntent() != null) {
 
             messId = getIntent().getStringExtra("RESTAURANT_ID");
             messName = getIntent().getStringExtra("RESTAURANT_NAME");
+            messImage = getIntent().getStringExtra("RESTAURANT_IMAGE");
 
             if (messId == null) messId = "";
             if (messName == null) messName = "";

@@ -22,6 +22,11 @@ public class CartManager {
 
     private static final Map<String, List<CartItem>> cartMap =
             new HashMap<>();
+    // ✅ Store Restaurant Images
+    private static final Map<String, String> restaurantImages =
+            new HashMap<>();
+
+    private static final String KEY_RESTAURANT_IMAGES = "RESTAURANT_IMAGES";
 
     // ✅ Store Restaurant Names
     private static final Map<String, String> restaurantNames =
@@ -51,6 +56,7 @@ public class CartManager {
     public static synchronized void setRestaurant(
             String resId,
             String resName,
+            String resImage,   // ✅ ADD
             Context ctx
     ) {
 
@@ -70,6 +76,12 @@ public class CartManager {
 
         // ✅ Save restaurant name
         restaurantNames.put(resId, resName);
+
+        // ✅ Save restaurant image
+        if (resImage != null && !resImage.isEmpty()) {
+            restaurantImages.put(resId, resImage);
+        }
+
 
         Log.d("CART_DEBUG", "SET -> id=" + resId + " name=" + resName);
 
@@ -143,10 +155,13 @@ public class CartManager {
 
         String json = gson.toJson(cartMap);
         String namesJson = gson.toJson(restaurantNames);
+        String imagesJson = gson.toJson(restaurantImages);
+
 
         pref.edit()
                 .putString(KEY_CART, json)
-                .putString(KEY_RESTAURANT_NAMES, namesJson) // ✅
+                .putString(KEY_RESTAURANT_NAMES, namesJson)
+                .putString(KEY_RESTAURANT_IMAGES, imagesJson) // ✅ ADD
                 .apply();
     }
 
@@ -166,6 +181,9 @@ public class CartManager {
         String json = pref.getString(KEY_CART, null);
             String namesJson =
                     pref.getString(KEY_RESTAURANT_NAMES, null);
+        String imagesJson =
+                pref.getString(KEY_RESTAURANT_IMAGES, null);
+
 
         if (json == null || json.isEmpty()) return;
 
@@ -200,6 +218,21 @@ public class CartManager {
                     }
                 }
 
+// ✅ Restore restaurant images
+                if (imagesJson != null && !imagesJson.isEmpty()) {
+
+                    Type imgType =
+                            new TypeToken<Map<String, String>>() {}.getType();
+
+                    Map<String, String> images =
+                            gson.fromJson(imagesJson, imgType);
+
+                    if (images != null) {
+
+                        restaurantImages.clear();
+                        restaurantImages.putAll(images);
+                    }
+                }
 
 
                 // ✅ Restore restaurant names from items (fallback)
@@ -550,6 +583,13 @@ public class CartManager {
         }
 
         return count;
+    }
+    // ✅ Get Restaurant Image
+    public static String getRestaurantImage(String resId) {
+
+        if (resId == null) return "";
+
+        return restaurantImages.getOrDefault(resId, "");
     }
 
 

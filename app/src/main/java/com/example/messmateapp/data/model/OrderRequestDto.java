@@ -2,6 +2,9 @@ package com.example.messmateapp.data.model;
 
 import java.util.List;
 
+// ✅ ADD THIS
+import com.example.messmateapp.data.model.AddressDto;
+
 public class OrderRequestDto {
 
     /* ================= ORDER ================= */
@@ -15,17 +18,13 @@ public class OrderRequestDto {
     public List<CartItemDto> items;
 
 
-    /* ================= ADDRESS (NEW) ================= */
+    /* ================= ADDRESS ================= */
 
-    // Full readable address
-    public String deliveryAddress;
-
-    // Location
-    public Double lat;
-    public Double lng;
+    // ✅ Send full structured address (not string)
+    public AddressDto deliveryAddress;
 
 
-    /* ================= RECEIVER (OPTIONAL) ================= */
+    /* ================= RECEIVER ================= */
 
     public String receiverName;
     public String receiverPhone;
