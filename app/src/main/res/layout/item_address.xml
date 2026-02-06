@@ -20,7 +20,7 @@
         android:gravity="center_vertical">
 
 
-        <!-- Icon -->
+        <!-- Location Icon -->
         <ImageView
             android:layout_width="36dp"
             android:layout_height="36dp"
@@ -28,7 +28,7 @@
             android:tint="@color/purple_500" />
 
 
-        <!-- Text -->
+        <!-- Address Text -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,6 +47,7 @@
                 android:textStyle="bold" />
 
 
+            <!-- Default Badge -->
             <TextView
                 android:id="@+id/txtDefault"
                 android:layout_width="wrap_content"
@@ -59,6 +60,19 @@
                 android:visibility="gone" />
 
         </LinearLayout>
+
+
+        <!-- 3 Dots (More / Delete) -->
+        <ImageView
+            android:id="@+id/btnMore"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_more_vert"
+            android:tint="#757575"
+            android:padding="4dp"
+            android:clickable="true"
+            android:focusable="true" />
 
 
         <!-- Arrow -->

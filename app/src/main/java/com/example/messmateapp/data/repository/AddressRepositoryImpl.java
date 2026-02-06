@@ -10,6 +10,8 @@ import com.example.messmateapp.data.model.AddressResponse;
 import com.example.messmateapp.data.remote.ApiClient;
 import com.example.messmateapp.data.remote.ApiService;
 import com.example.messmateapp.utils.Resource;
+import com.example.messmateapp.utils.SessionManager;
+import com.example.messmateapp.data.model.DeleteAddressResponse;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ import retrofit2.Response;
 public class AddressRepositoryImpl implements AddressRepository {
 
     private final ApiService apiService;
+    private final Context context;
 
 
     /* =================================================
@@ -31,12 +34,13 @@ public class AddressRepositoryImpl implements AddressRepository {
 
     public AddressRepositoryImpl(Context context) {
 
+        this.context = context;   // ⭐ ADD THIS LINE
+
         apiService =
                 ApiClient
                         .getAuthClient(context)
                         .create(ApiService.class);
     }
-
 
     /* =================================================
        📍 GET ALL ADDRESSES
@@ -262,38 +266,42 @@ public class AddressRepositoryImpl implements AddressRepository {
 
         liveData.setValue(Resource.loading());
 
-        apiService.deleteAddress(id)
-                .enqueue(new Callback<AddressResponse>() {   // ✅ FIXED
+
+        SessionManager session = new SessionManager(context);
+
+        String token = "Bearer " + session.getToken();
+
+
+        apiService.deleteAddress(id, token)
+                .enqueue(new Callback<DeleteAddressResponse>() {
 
                     @Override
                     public void onResponse(
-                            Call<AddressResponse> call,
-                            Response<AddressResponse> response) {
+                            Call<DeleteAddressResponse> call,
+                            Response<DeleteAddressResponse> response
+                    ) {
 
                         if (response.isSuccessful()
                                 && response.body() != null
-                                && response.body().success) {
+                                && response.body().isSuccess()) {
 
-                            liveData.setValue(
-                                    Resource.success(response.body().addresses)
-                            );
+                            liveData.setValue(Resource.success(new java.util.ArrayList<>()));
+
 
                         } else {
 
-                            liveData.setValue(
-                                    Resource.error("Delete failed")
-                            );
+                            liveData.setValue(Resource.error("Delete failed"));
                         }
                     }
 
+
                     @Override
                     public void onFailure(
-                            Call<AddressResponse> call,
-                            Throwable t) {
+                            Call<DeleteAddressResponse> call,
+                            Throwable t
+                    ) {
 
-                        liveData.setValue(
-                                Resource.error("Network Error")
-                        );
+                        liveData.setValue(Resource.error("Server error"));
                     }
                 });
 

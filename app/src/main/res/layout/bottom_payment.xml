@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@android:color/white">
+
+
+    <!-- Title -->
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Payment Method"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#111827"
+        android:layout_marginBottom="20dp"/>
+
+
+    <!-- Payment Options -->
+
+    <RadioGroup
+        android:id="@+id/radioGroupPayment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <!-- Online -->
+
+        <RadioButton
+            android:id="@+id/radioOnline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Online (UPI / Card / Wallet)"
+            android:textSize="15sp"
+            android:padding="12dp"
+            android:buttonTint="#E23744"/>
+
+
+        <!-- COD -->
+
+        <RadioButton
+            android:id="@+id/radioCod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cash on Delivery (COD)"
+            android:textSize="15sp"
+            android:padding="12dp"
+            android:buttonTint="#E23744"/>
+
+    </RadioGroup>
+
+
+    <!-- Confirm Button -->
+
+    <Button
+        android:id="@+id/btnConfirmPayment"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+
+        android:text="Confirm &amp; Continue"
+        android:textSize="15sp"
+        android:textStyle="bold"
+
+        android:backgroundTint="#E23744"
+        android:textColor="@android:color/white"
+
+        android:elevation="4dp"
+        android:stateListAnimator="@null"/>
+
+
+</LinearLayout>

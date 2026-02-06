@@ -165,7 +165,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-
     private void bringAllCartsToFront() {
         if (btnAllCarts != null) {
 
@@ -178,8 +177,6 @@ public class HomeActivity extends AppCompatActivity {
             btnAllCarts.requestLayout();
         }
     }
-
-
 
     // ================= INIT =================
     private void initViews() {

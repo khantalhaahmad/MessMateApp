@@ -78,6 +78,9 @@ public class CheckoutActivity extends AppCompatActivity
     // ✅ Payment
     private RadioGroup rgPayment;
     private RadioButton rbOnline, rbCOD;
+    private String selectedPayment = "";
+    private ImageView btnChangePayment;
+    private LinearLayout layoutPaymentAction;
 
 
     /* ================= Adapter ================= */
@@ -174,7 +177,17 @@ public class CheckoutActivity extends AppCompatActivity
 
     private void initViews() {
 
-        btnPlaceOrder = findViewById(R.id.btnPlaceOrder);
+        // 🔥 Payment Action Layout (Button + Edit Icon)
+        layoutPaymentAction = findViewById(R.id.layoutPaymentAction);
+
+        // 🔥 Main Button
+        btnPlaceOrder = findViewById(R.id.btnSelectPayment);
+
+        // 🔥 Change Payment Icon
+        btnChangePayment = findViewById(R.id.btnChangePayment);
+
+
+        // Address Button
         btnSelectAddress = findViewById(R.id.btnSelectAddress);
 
         layoutAddMore = findViewById(R.id.layoutAddMore);
@@ -187,18 +200,7 @@ public class CheckoutActivity extends AppCompatActivity
         tvMessName = findViewById(R.id.tvMessName);
 
         tvAddress = findViewById(R.id.tvAddress);
-        tvChangeAddress = findViewById(R.id.tvChangeAddress); // ✅ IMPORTANT
-
-
-        // ✅ Payment Options (ADD THIS)
-        rgPayment = findViewById(R.id.rgPayment);
-        rbOnline = findViewById(R.id.rbOnline);
-        rbCOD = findViewById(R.id.rbCOD);
-
-        // Default = Online
-        if (rbOnline != null) {
-            rbOnline.setChecked(true);
-        }
+        tvChangeAddress = findViewById(R.id.tvChangeAddress);
 
 
         View card = findViewById(R.id.cardTotalBill);
@@ -210,23 +212,29 @@ public class CheckoutActivity extends AppCompatActivity
         tvBillPhone = card.findViewById(R.id.tvBillPhone);
 
 
+        // Set Restaurant Name
         if (!messName.isEmpty()) {
             tvMessName.setText(messName);
         }
 
 
+        // Click Listeners
         layoutTotalBill.setOnClickListener(v -> showBillPopup());
         layoutPhoneEdit.setOnClickListener(v -> showEditPhoneDialog());
 
 
-        // ✅ Change Address Click
+        // Change Address
         if (tvChangeAddress != null) {
             tvChangeAddress.setOnClickListener(v -> openAddressBottomSheet());
         }
+
+
+        // 🔥 Default UI State
+        btnPlaceOrder.setText("Select Payment Method");
+
+        // Hide edit icon initially
+        btnChangePayment.setVisibility(View.GONE);
     }
-
-
-
 
     /* ================= Button Control ================= */
 
@@ -369,23 +377,34 @@ public class CheckoutActivity extends AppCompatActivity
                 return;
             }
 
-            if (rbCOD.isChecked()) {
+            // 🔥 FIRST TIME → Open BottomSheet
+            if (selectedPayment.isEmpty()) {
+                showPaymentBottomSheet();
+                return;
+            }
 
-                placeOrderCOD();   // COD
+            // 🔥 AFTER SELECT
+            if (selectedPayment.equals("COD")) {
+
+                placeOrderCOD();
 
             } else {
 
-                startPaymentFlow(); // Razorpay
+                startPaymentFlow();
             }
         });
 
 
-
-        // ✅ Only BottomSheet (No Address Activity)
-
+        // Address BottomSheet
         btnSelectAddress.setOnClickListener(v ->
                 openAddressBottomSheet()
         );
+// 🔁 Change Payment Anytime
+
+        btnChangePayment.setOnClickListener(v -> {
+
+            showPaymentBottomSheet();
+        });
 
 
         layoutAddMore.setOnClickListener(v -> {
@@ -399,6 +418,7 @@ public class CheckoutActivity extends AppCompatActivity
             startActivity(intent);
         });
     }
+
 
 
     /* ================= Recommendation ================= */
@@ -511,6 +531,43 @@ public class CheckoutActivity extends AppCompatActivity
         tvFinalAmount.setText("₹" + finalGrandTotal);
     }
 
+    private void showPaymentBottomSheet() {
+
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+
+        View view = getLayoutInflater()
+                .inflate(R.layout.bottom_payment, null);
+
+        dialog.setContentView(view);
+
+        RadioGroup rg = view.findViewById(R.id.radioGroupPayment);
+
+        Button btnConfirm = view.findViewById(R.id.btnConfirmPayment);
+
+        btnConfirm.setOnClickListener(v -> {
+
+            int id = rg.getCheckedRadioButtonId();
+
+            if (id == -1) {
+                Toast.makeText(this,
+                        "Select payment method",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (id == R.id.radioOnline) {
+                selectedPayment = "ONLINE";
+            } else {
+                selectedPayment = "COD";
+            }
+
+            dialog.dismiss();
+
+            updatePaymentButton();
+        });
+
+        dialog.show();
+    }
 
     /* ================= Place Order ================= */
 
@@ -528,7 +585,7 @@ public class CheckoutActivity extends AppCompatActivity
         order.mess_id = messId;
         order.mess_name = messName;
 
-        order.paymentMethod = "Online";
+        order.paymentMethod = selectedPayment;
         order.total_price = finalGrandTotal;
 
 
@@ -839,23 +896,27 @@ public class CheckoutActivity extends AppCompatActivity
     @Override
     public void onAddressSelected(AddressDto address) {
 
+        // Set locally
         selectedAddress = address;
 
+        // Update UI
         updateAddressUI(address);
 
         updateBottomButton();
 
+        // Repo
         AddressRepositoryImpl repo =
                 new AddressRepositoryImpl(this);
 
         // ✅ Call backend select API
-        repo.selectAddress(address._id)
+        repo.selectAddress(address.getId())
                 .observe(this, res -> {
 
                     if (res.isLoading()) return;
 
                     if (res.isSuccess() && res.getData() != null) {
 
+                        // Update selected address from backend
                         selectedAddress = res.getData();
 
                         updateAddressUI(selectedAddress);
@@ -876,8 +937,6 @@ public class CheckoutActivity extends AppCompatActivity
                     }
                 });
     }
-
-
     /* ================= Helpers ================= */
 
     private void clearAddress() {
@@ -897,7 +956,6 @@ public class CheckoutActivity extends AppCompatActivity
     }
 
 
-
     private void updateAddressUI(AddressDto a) {
 
         if (a == null) {
@@ -907,45 +965,42 @@ public class CheckoutActivity extends AppCompatActivity
 
         StringBuilder sb = new StringBuilder();
 
-        // Label (Home / Work etc.)
-        if (a.label != null && !a.label.isEmpty()) {
-            sb.append(a.label).append(" • ");
+        // Label
+        if (a.getLabel() != null && !a.getLabel().isEmpty()) {
+            sb.append(a.getLabel()).append(" • ");
         }
 
-        // House / Flat
-        if (a.house != null && !a.house.isEmpty()) {
-            sb.append(a.house).append(", ");
+        // House
+        if (a.getHouse() != null && !a.getHouse().isEmpty()) {
+            sb.append(a.getHouse()).append(", ");
         }
 
         // Area
-        if (a.area != null && !a.area.isEmpty()) {
-            sb.append(a.area).append(", ");
+        if (a.getArea() != null && !a.getArea().isEmpty()) {
+            sb.append(a.getArea()).append(", ");
         }
 
-        // Landmark (Optional)
-        if (a.landmark != null && !a.landmark.isEmpty()) {
-            sb.append(a.landmark).append(", ");
+        // Landmark
+        if (a.getLandmark() != null && !a.getLandmark().isEmpty()) {
+            sb.append(a.getLandmark()).append(", ");
         }
 
         // City
-        if (a.city != null && !a.city.isEmpty()) {
-            sb.append(a.city);
+        if (a.getCity() != null && !a.getCity().isEmpty()) {
+            sb.append(a.getCity());
         }
 
         // Pincode
-        if (a.pincode != null && !a.pincode.isEmpty()) {
-            sb.append(" - ").append(a.pincode);
+        if (a.getPincode() != null && !a.getPincode().isEmpty()) {
+            sb.append(" - ").append(a.getPincode());
         }
 
-        // Set Address Text
         tvAddress.setText(sb.toString());
 
-        // ✅ Show "Change" button if exists
         if (tvChangeAddress != null) {
             tvChangeAddress.setVisibility(View.VISIBLE);
         }
 
-        // Refresh bottom button
         updateBottomButton();
     }
 
@@ -1060,7 +1115,6 @@ public class CheckoutActivity extends AppCompatActivity
     }
 
 
-
     private void openRazorpay(CreateOrderResponse res) {
 
         Checkout checkout = new Checkout();
@@ -1153,6 +1207,7 @@ public class CheckoutActivity extends AppCompatActivity
                     }
                 });
     }
+
     private void placeOrderCOD() {
 
         btnPlaceOrder.setEnabled(false);
@@ -1233,5 +1288,16 @@ public class CheckoutActivity extends AppCompatActivity
                         ).show();
                     }
                 });
+    }
+// ================= PAYMENT BUTTON UPDATE =================
+
+    private void updatePaymentButton() {
+
+        btnPlaceOrder.setText(
+                "Place Order (" + selectedPayment + ")"
+        );
+
+        // Show edit icon after selection
+        btnChangePayment.setVisibility(View.VISIBLE);
     }
 }

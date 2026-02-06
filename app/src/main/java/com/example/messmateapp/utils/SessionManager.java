@@ -128,4 +128,32 @@ public class SessionManager {
     public double getLng() {
         return pref.getFloat(KEY_LNG, 0);
     }
+
+    /* ================= SETTINGS ================= */
+
+    // Dark Mode
+    private static final String KEY_DARK = "dark_mode";
+
+    // Notification
+    private static final String KEY_NOTIFY = "notify_enabled";
+
+
+    public void setDarkMode(boolean v) {
+        editor.putBoolean(KEY_DARK, v);
+        editor.apply();
+    }
+
+    public boolean isDark() {
+        return pref.getBoolean(KEY_DARK, false);
+    }
+
+
+    public void setNotification(boolean v) {
+        editor.putBoolean(KEY_NOTIFY, v);
+        editor.apply();
+    }
+
+    public boolean isNotify() {
+        return pref.getBoolean(KEY_NOTIFY, true);
+    }
 }

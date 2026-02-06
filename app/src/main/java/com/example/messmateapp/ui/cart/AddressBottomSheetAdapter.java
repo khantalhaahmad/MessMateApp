@@ -49,7 +49,7 @@ public class AddressBottomSheetAdapter
 
             for (int i = 0; i < list.size(); i++) {
 
-                if (list.get(i).isDefault) {
+                if (list.get(i).isDefault()) { // ✅ getter
                     selectedPosition = i;
                     return;
                 }
@@ -100,10 +100,10 @@ public class AddressBottomSheetAdapter
         /* ---------- Build Full Address ---------- */
 
         String fullAddress =
-                safe(address.house) + ", " +
-                        safe(address.area) + ", " +
-                        safe(address.city) + " - " +
-                        safe(address.pincode);
+                safe(address.getHouse()) + ", " +
+                        safe(address.getArea()) + ", " +
+                        safe(address.getCity()) + " - " +
+                        safe(address.getPincode());
 
         holder.tvAddress.setText(fullAddress);
 
@@ -113,8 +113,8 @@ public class AddressBottomSheetAdapter
         if (holder.tvLabel != null) {
 
             holder.tvLabel.setText(
-                    address.label != null && !address.label.isEmpty()
-                            ? address.label
+                    address.getLabel() != null && !address.getLabel().isEmpty()
+                            ? address.getLabel()
                             : "Address"
             );
         }
@@ -151,7 +151,7 @@ public class AddressBottomSheetAdapter
             }
 
             // Close sheet (Checkout will refresh UI)
-            v.postDelayed(() -> dialog.dismiss(), 200);
+            v.postDelayed(dialog::dismiss, 200);
         });
     }
 

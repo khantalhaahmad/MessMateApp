@@ -169,54 +169,7 @@
                     android:layout_height="160dp"
                     android:nestedScrollingEnabled="false"/>
 
-                <!-- ================= PAYMENT OPTIONS ================= -->
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="3dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Payment Method"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="10dp"/>
-
-                        <RadioGroup
-                            android:id="@+id/rgPayment"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <RadioButton
-                                android:id="@+id/rbOnline"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Online (UPI / Card / Wallet)"
-                                android:checked="true"
-                                android:padding="6dp"/>
-
-                            <RadioButton
-                                android:id="@+id/rbCOD"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Cash on Delivery (COD)"
-                                android:padding="6dp"/>
-
-                        </RadioGroup>
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
 
                 <!-- ================= BILL ================= -->
 
@@ -314,24 +267,53 @@
 
             <!-- PLACE ORDER -->
 
-            <Button
-                android:id="@+id/btnPlaceOrder"
+            <!-- PLACE ORDER + CHANGE PAYMENT -->
+
+            <LinearLayout
+                android:id="@+id/layoutPaymentAction"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:layout_marginTop="6dp"
-
-                android:text="Place Order"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.05"
-
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:backgroundTint="#E23744"
-                android:textColor="@android:color/white"
+                android:background="@drawable/red_button"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
 
-                android:elevation="6dp"
-                android:stateListAnimator="@null"
+                <!-- Place Order Button -->
 
-                android:visibility="gone"/>
+                <Button
+                    android:id="@+id/btnSelectPayment"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+
+                    android:text="Select Payment Method"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+
+                    android:background="@android:color/transparent"
+                    android:textColor="@android:color/white"
+
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"/>
+
+
+                <!-- Change Icon -->
+
+                <ImageView
+                    android:id="@+id/btnChangePayment"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+
+                    android:src="@drawable/ic_edit"
+                    android:tint="@android:color/white"
+                    android:padding="2dp"/>
+
+            </LinearLayout>
+
+
 
 
         </LinearLayout>

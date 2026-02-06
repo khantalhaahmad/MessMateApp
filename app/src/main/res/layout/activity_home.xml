@@ -28,24 +28,35 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Delivering to"
-                android:textSize="12sp"
-                android:textColor="@color/textSecondary"/>
+            <!-- 📍 Pin Icon -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_pin"
+                android:tint="#FF3B30"
+                android:layout_marginEnd="6dp"/>
 
+            <!-- Address -->
             <TextView
                 android:id="@+id/tvLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hostel / PG"
+
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/textPrimary"/>
+                android:textColor="@color/textPrimary"
+
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+
+
         </LinearLayout>
+
 
 
         <!-- PROFILE -->

@@ -338,18 +338,16 @@ public class AddAddressActivity extends AppCompatActivity
 
         AddressDto address = new AddressDto();
 
-        address.label = label;
+        address.setLabel(label);
+        address.setHouse(house);
+        address.setArea(area);
+        address.setCity(city);
+        address.setState(state);
+        address.setPincode(pin);   // ✅ FIXED
+        address.setLandmark(landmark);
+        address.setLat(lat);
+        address.setLng(lng);
 
-        address.house = house;
-        address.area = area;
-        address.city = city;
-        address.state = state;
-        address.pincode = pin;
-
-        address.landmark = landmark;
-
-        address.lat = lat;
-        address.lng = lng;
 
         // 🔥 Disable button to avoid double click
         findViewById(R.id.btnSave).setEnabled(false);

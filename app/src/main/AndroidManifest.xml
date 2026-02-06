@@ -124,6 +124,13 @@
             android:launchMode="singleTop"
             android:parentActivityName=".ui.address.AddressListActivity" />
 
+        <!-- ================= ADDRESS ZOMATO ================= -->
+
+        <activity
+            android:name=".ui.address.AddressZomatoActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.profile.ProfileActivity" />
 
         <!-- ================= MAP PICKER ================= -->
 
