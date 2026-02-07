@@ -136,5 +136,14 @@
     </style>
 
 
+    <style name="ProfileInput">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:background">@drawable/bg_input</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 
 </resources>

@@ -24,6 +24,7 @@ import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.PUT;
 
 public interface ApiService {
 
@@ -137,14 +138,14 @@ public interface ApiService {
 
     /* ================= PROFILE ================= */
 
-    // ✅ Get My Profile
-    @GET("user/me")
-    Call<UserResponse> getProfile();
+    @GET("users/me")
+    Call<UserResponse> getProfile(
+            @Header("Authorization") String token
+    );
 
-
-    // ✅ Update Profile
-    @PATCH("user/me")
+    @PUT("users/me")
     Call<UserResponse> updateProfile(
+            @Header("Authorization") String token,
             @Body Map<String, String> body
     );
 }

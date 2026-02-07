@@ -29,7 +29,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     /* ================= UI ================= */
 
-    private TextView tvName, tvAvatar, tvEditText;
+    private TextView tvName, tvEditText, tvEmail, tvPhone;
 
     private LinearLayout btnEdit, btnAddress;
 
@@ -67,13 +67,15 @@ public class ProfileActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> onBackPressed());
 
         // Edit Profile
-        tvEditText.setOnClickListener(v ->
-                Toast.makeText(
-                        this,
-                        "Edit Profile (Coming Soon)",
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        tvEditText.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    ProfileActivity.this,
+                    EditProfileActivity.class
+            );
+
+            startActivity(intent);
+        });
 
         // Address Book
         btnAddress.setOnClickListener(v ->
@@ -113,6 +115,10 @@ public class ProfileActivity extends AppCompatActivity {
         tvName = findViewById(R.id.tvName);
         tvEditText = findViewById(R.id.tvEditText);
 
+        // ✅ ADD THESE
+        tvEmail = findViewById(R.id.tvEmail);
+        tvPhone = findViewById(R.id.tvPhone);
+
         btnAddress = findViewById(R.id.layoutAddress);
 
         switchDark = findViewById(R.id.switchDark);
@@ -127,7 +133,27 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadProfile() {
 
-        api.getProfile().enqueue(new Callback<UserResponse>() {
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        // ✅ Get token
+        SessionManager session = new SessionManager(this);
+        String token = session.getToken();
+
+        if (token == null) {
+
+            Toast.makeText(
+                    this,
+                    "Login expired. Please login again.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            return;
+        }
+
+        String authToken = "Bearer " + token;
+
+        // ✅ Call API with token
+        api.getProfile(authToken).enqueue(new Callback<UserResponse>() {
 
             @Override
             public void onResponse(Call<UserResponse> call,
@@ -139,27 +165,15 @@ public class ProfileActivity extends AppCompatActivity {
 
                     UserResponse.User user = response.body().getUser();
 
-                    // Get Name
-                    String name = user.getName();
-
-                    // Show Name Only
-                    tvName.setText(name != null ? name : "User");
-
-                    // Set Avatar (First Letter)
-                    TextView tvAvatar = findViewById(R.id.tvAvatar);
-
-                    if (tvAvatar != null && name != null && !name.isEmpty()) {
-
-                        tvAvatar.setText(
-                                name.substring(0, 1).toUpperCase()
-                        );
-                    }
+                    tvName.setText(user.getName());
+                    tvEmail.setText(user.getEmail());
+                    tvPhone.setText(user.getPhone());
 
                 } else {
 
                     Toast.makeText(
                             ProfileActivity.this,
-                            "Failed to load profile",
+                            "Failed (" + response.code() + ") ❌",
                             Toast.LENGTH_SHORT
                     ).show();
                 }
@@ -170,7 +184,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                 Toast.makeText(
                         ProfileActivity.this,
-                        "Server error",
+                        "Network Error ❌",
                         Toast.LENGTH_SHORT
                 ).show();
             }
@@ -225,6 +239,13 @@ public class ProfileActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT
             ).show();
         }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // 🔥 Jab bhi screen wapas aaye, fresh profile load karo
+        loadProfile();
     }
 
 

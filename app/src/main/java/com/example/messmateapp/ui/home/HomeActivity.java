@@ -46,6 +46,7 @@ import com.example.messmateapp.utils.SessionManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import java.util.List;
+import android.widget.LinearLayout;
 
 
 import java.util.ArrayList;
@@ -84,6 +85,11 @@ public class HomeActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient locationClient;
 
+    private TextView btnDelivery, btnOrders;
+    private LinearLayout tabDelivery, tabOrders;
+
+    private View tabIndicator;
+    private FrameLayout layoutBottomNav;
 
     // ================= ZOMATO STYLE FOOD NAMES =================
 
@@ -115,6 +121,10 @@ public class HomeActivity extends AppCompatActivity {
         setupSearch();
         setupProfileClick();
         setupSearchHintSwitcher();
+        setupBottomTabs();
+        tabDelivery.bringToFront();
+        tabOrders.bringToFront();
+
 
         // 🔥 LOCATION SETUP
         setupLocation();
@@ -195,15 +205,51 @@ public class HomeActivity extends AppCompatActivity {
         // 🔥 LOCATION TEXT
         tvLocation = findViewById(R.id.tvLocation);
 
+        // 🔥 ZOMATO STYLE BOTTOM TABS
+        tabDelivery = findViewById(R.id.tabDelivery);
+        tabOrders   = findViewById(R.id.tabOrders);
+        btnDelivery = findViewById(R.id.btnDelivery);
+        btnOrders   = findViewById(R.id.btnOrders);
+        tabIndicator = findViewById(R.id.tabIndicator);
+        layoutBottomNav = findViewById(R.id.layoutBottomNav);
+
+        // 🔥 CART
         btnAllCarts = findViewById(R.id.btnAllCarts);
         popupContainer = findViewById(R.id.popupContainer);
-
 
         // 🔥 SESSION + LOCATION CLIENT
         session = new SessionManager(this);
 
         locationClient =
                 LocationServices.getFusedLocationProviderClient(this);
+
+        // 🔥 SET TAB CLICK
+        setupBottomTabs();
+    }
+
+    // ================= BOTTOM TAB =================
+    private void setupBottomTabs() {
+
+        if (tabDelivery == null || tabOrders == null) return;
+
+        // Wait for layout
+        layoutBottomNav.post(() -> {
+
+            int width = layoutBottomNav.getWidth() / 2;
+
+            ViewGroup.LayoutParams params =
+                    tabIndicator.getLayoutParams();
+
+            params.width = width;
+            tabIndicator.setLayoutParams(params);
+
+            // Default
+            selectDelivery();
+        });
+
+        tabDelivery.setOnClickListener(v -> selectDelivery());
+
+        tabOrders.setOnClickListener(v -> selectOrders());
     }
 
 
@@ -568,6 +614,33 @@ public class HomeActivity extends AppCompatActivity {
             delay += 250; // stack animation feel
         }
     }
+
+    private void selectDelivery() {
+
+        tabIndicator.animate()
+                .translationX(0)
+                .setDuration(250)
+                .start();
+
+        btnDelivery.setTextColor(getColor(android.R.color.white));
+        btnOrders.setTextColor(getColor(R.color.textSecondary));
+    }
+
+
+
+    private void selectOrders() {
+
+        float move = tabIndicator.getWidth();
+
+        tabIndicator.animate()
+                .translationX(move)
+                .setDuration(250)
+                .start();
+
+        btnOrders.setTextColor(getColor(android.R.color.white));
+        btnDelivery.setTextColor(getColor(R.color.textSecondary));
+    }
+
 
     /* ================= RESUME CART ================= */
 

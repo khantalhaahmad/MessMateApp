@@ -63,37 +63,61 @@
                 android:textStyle="bold"/>
 
 
-            <!-- Name + Edit -->
-            <LinearLayout
-                android:layout_width="0dp"
+        <!-- Name + Info + Edit -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+
+            <!-- Name -->
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:text="User"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#111827"/>
 
 
-                <TextView
-                    android:id="@+id/tvName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="User"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#111827"/>
+            <!-- Email -->
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="email@gmail.com"
+                android:textSize="13sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="4dp"/>
 
 
-                <TextView
-                    android:id="@+id/tvEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Edit Profile ›"
-                    android:textSize="14sp"
-                    android:textColor="#2563EB"
-                    android:layout_marginTop="4dp"/>
+            <!-- Phone -->
+            <TextView
+                android:id="@+id/tvPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="9999999999"
+                android:textSize="13sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="2dp"/>
 
-            </LinearLayout>
+
+            <!-- Edit -->
+            <TextView
+                android:id="@+id/tvEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit Profile ›"
+                android:textSize="14sp"
+                android:textColor="#2563EB"
+                android:layout_marginTop="6dp"/>
 
         </LinearLayout>
+
+    </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 

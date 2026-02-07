@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@android:color/transparent">
 
 
     <!-- ================= TOP BAR ================= -->
@@ -53,11 +53,7 @@
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
-
-
         </LinearLayout>
-
-
 
         <!-- PROFILE -->
 
@@ -82,13 +78,17 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
+
+        android:paddingBottom="0dp"
+        android:clipToPadding="false"
+
         app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toTopOf="@id/layoutResumeCart"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
 
-        <LinearLayout
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -247,6 +247,102 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <!-- ================= FLOATING BOTTOM NAV ================= -->
+    <FrameLayout
+        android:id="@+id/layoutBottomNav"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_bottom_pill"
+        android:padding="4dp"
+
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- SLIDING INDICATOR (BACKGROUND) -->
+        <View
+            android:id="@+id/tabIndicator"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@drawable/bg_tab_selected"/>
+
+
+
+        <!-- TABS CONTAINER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!-- DELIVERY -->
+            <LinearLayout
+                android:id="@+id/tabDelivery"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_delivery"
+                    android:tint="@android:color/white"/>
+
+                <TextView
+                    android:id="@+id/btnDelivery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+
+                    android:layout_marginStart="6dp"
+
+                    android:gravity="center"
+                    android:singleLine="true"
+
+                    android:text="Delivery"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+
+            <!-- ORDERS -->
+            <LinearLayout
+                android:id="@+id/tabOrders"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_orders"
+                    android:tint="#777777"/>
+
+                <TextView
+                    android:id="@+id/btnOrders"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+
+                    android:layout_marginStart="6dp"
+
+                    android:gravity="center"
+                    android:singleLine="true"
+
+                    android:text="Orders"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="#777777"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
 
     <!-- ================= RESUME CART BAR ================= -->
 
@@ -335,9 +431,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
-
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

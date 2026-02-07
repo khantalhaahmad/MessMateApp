@@ -6,6 +6,8 @@ public class UserResponse {
     private User user;
 
 
+    /* ================= MAIN RESPONSE ================= */
+
     public boolean isSuccess() {
         return success;
     }
@@ -15,7 +17,7 @@ public class UserResponse {
     }
 
 
-    // ================= INNER USER MODEL =================
+    /* ================= INNER USER MODEL ================= */
 
     public static class User {
 
@@ -25,8 +27,15 @@ public class UserResponse {
         private String email;
         private String role;
         private String avatar;
+
+        // ✅ NEW FIELDS
+        private String dob;
+        private String gender;
+
         private boolean profileComplete;
 
+
+        /* ================= GETTERS ================= */
 
         public String getId() {
             return id;
@@ -50,6 +59,16 @@ public class UserResponse {
 
         public String getAvatar() {
             return avatar;
+        }
+
+        // ✅ NEW GETTERS
+
+        public String getDob() {
+            return dob;
+        }
+
+        public String getGender() {
+            return gender;
         }
 
         public boolean isProfileComplete() {
