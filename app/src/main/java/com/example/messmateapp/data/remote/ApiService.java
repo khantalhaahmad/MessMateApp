@@ -12,6 +12,7 @@ import com.example.messmateapp.data.model.RecommendationResponse;
 import com.example.messmateapp.data.model.RestaurantDto;
 import com.example.messmateapp.data.model.VerifyResponse;
 import com.example.messmateapp.data.model.UserResponse;
+import com.example.messmateapp.data.model.OrderHistoryResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,12 @@ public interface ApiService {
     @POST("orders")
     Call<Object> placeOrder(
             @Body OrderRequestDto body
+    );
+
+    // ✅ Get User Order History
+    @GET("orders/my-orders")
+    Call<OrderHistoryResponse> getMyOrders(
+            @Header("Authorization") String token
     );
 
 

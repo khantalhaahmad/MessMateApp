@@ -12,6 +12,7 @@ import com.example.messmateapp.data.remote.ApiService;
 import com.example.messmateapp.domain.repository.OrderRepository;
 import com.example.messmateapp.utils.Resource;
 import com.example.messmateapp.utils.SessionManager;
+import com.example.messmateapp.data.model.OrderHistoryResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -120,5 +121,15 @@ public class OrderRepositoryImpl implements OrderRepository {
                 });
 
         return liveData;
+    }
+
+    @Override
+    public Call<OrderHistoryResponse> getMyOrders() {
+
+        String token = sessionManager.getToken();
+
+        return apiService.getMyOrders(
+                "Bearer " + token
+        );
     }
 }

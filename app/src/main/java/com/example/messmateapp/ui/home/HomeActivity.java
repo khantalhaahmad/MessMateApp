@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.content.Intent;
 
 import com.example.messmateapp.R;
 import com.example.messmateapp.data.repository.HomeRepositoryImpl;
@@ -243,14 +244,30 @@ public class HomeActivity extends AppCompatActivity {
             params.width = width;
             tabIndicator.setLayoutParams(params);
 
-            // Default
+            // Default tab
             selectDelivery();
         });
 
-        tabDelivery.setOnClickListener(v -> selectDelivery());
+        // Delivery Tab
+        tabDelivery.setOnClickListener(v -> {
+            selectDelivery();
+        });
 
-        tabOrders.setOnClickListener(v -> selectOrders());
+        // Orders Tab
+        tabOrders.setOnClickListener(v -> {
+
+            selectOrders();
+
+            // ✅ Open Order History Screen
+            Intent intent = new Intent(
+                    HomeActivity.this,
+                    com.example.messmateapp.ui.order.OrderHistoryActivity.class
+            );
+
+            startActivity(intent);
+        });
     }
+
 
 
     // ================= PROFILE =================
