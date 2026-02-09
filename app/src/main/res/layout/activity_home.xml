@@ -248,19 +248,25 @@
     </androidx.core.widget.NestedScrollView>
 
     <!-- ================= FLOATING BOTTOM NAV ================= -->
+
     <FrameLayout
         android:id="@+id/layoutBottomNav"
         android:layout_width="0dp"
         android:layout_height="56dp"
+
+        android:layout_marginBottom="16dp"
+
         android:background="@drawable/bg_bottom_pill"
         android:padding="4dp"
+        android:elevation="12dp"
 
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- SLIDING INDICATOR (BACKGROUND) -->
+
+        <!-- SLIDING INDICATOR -->
         <View
             android:id="@+id/tabIndicator"
             android:layout_width="0dp"
@@ -269,12 +275,12 @@
             android:background="@drawable/bg_tab_selected"/>
 
 
-
         <!-- TABS CONTAINER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
+
 
             <!-- DELIVERY -->
             <LinearLayout
@@ -295,17 +301,15 @@
                     android:id="@+id/btnDelivery"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-
                     android:layout_marginStart="6dp"
-
                     android:gravity="center"
                     android:singleLine="true"
-
                     android:text="Delivery"
                     android:textStyle="bold"
                     android:textSize="14sp"
                     android:textColor="@android:color/white"/>
             </LinearLayout>
+
 
             <!-- ORDERS -->
             <LinearLayout
@@ -326,23 +330,19 @@
                     android:id="@+id/btnOrders"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-
                     android:layout_marginStart="6dp"
-
                     android:gravity="center"
                     android:singleLine="true"
-
                     android:text="Orders"
                     android:textStyle="bold"
                     android:textSize="14sp"
                     android:textColor="#777777"/>
             </LinearLayout>
 
+
         </LinearLayout>
 
-
     </FrameLayout>
-
 
     <!-- ================= RESUME CART BAR ================= -->
 
@@ -413,6 +413,51 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/layoutResumeCart"/>
+
+    <!-- ================= FULL SCREEN LOADING ================= -->
+
+    <FrameLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+
+            <ProgressBar
+                android:layout_width="48dp"
+                android:layout_height="48dp"/>
+
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Finding your orders... ☕"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#666666" />
+
+
+        </LinearLayout>
+
+    </FrameLayout>
+
 
     <!-- ================= POPUP OVERLAY LAYER ================= -->
 

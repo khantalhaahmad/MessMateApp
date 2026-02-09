@@ -1,147 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/transparent">
 
-    android:orientation="vertical"
-    android:background="@android:color/white">
+
 
 
     <!-- ================= HEADER ================= -->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+<LinearLayout
+android:id="@+id/header"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:gravity="center_vertical"
+android:padding="16dp"
 
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-
-        android:padding="16dp">
-
-
-        <!-- Back -->
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_back"
-            android:tint="#222222"/>
+app:layout_constraintTop_toTopOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent">
 
 
-        <!-- Title -->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+<ImageView
+    android:id="@+id/btnBack"
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:src="@drawable/ic_back"
+    android:tint="#222222"/>
 
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
 
-            android:text="My Orders"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#222222"/>
+<TextView
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_marginStart="12dp"
+    android:text="My Orders"
+    android:textSize="20sp"
+    android:textStyle="bold"
+    android:textColor="#222222"/>
 
-    </LinearLayout>
+</LinearLayout>
 
 
     <!-- ================= SEARCH ================= -->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+<LinearLayout
+android:id="@+id/searchBox"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:layout_margin="16dp"
 
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
+android:orientation="horizontal"
+android:gravity="center_vertical"
+android:background="@drawable/bg_search"
+android:padding="12dp"
 
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-
-        android:background="@drawable/bg_search"
-        android:padding="12dp">
-
-
-        <!-- Search Icon -->
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:src="@drawable/ic_search"
-            android:tint="#888888"/>
+app:layout_constraintTop_toBottomOf="@id/header"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent">
 
 
-        <!-- Input -->
-        <EditText
-            android:id="@+id/etSearchOrder"
+<ImageView
+    android:layout_width="18dp"
+    android:layout_height="18dp"
+    android:src="@drawable/ic_search"
+    android:tint="#888888"/>
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
 
-            android:layout_marginStart="8dp"
+<EditText
+    android:id="@+id/etSearchOrder"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
 
-            android:hint="Search by restaurant or dish"
-            android:textSize="14sp"
-            android:textColor="#222222"
-            android:textColorHint="#999999"
+    android:hint="Search by restaurant or dish"
+    android:textSize="14sp"
+    android:textColor="#222222"
+    android:textColorHint="#999999"
+    android:background="@null"/>
 
-            android:background="@null"
-            android:padding="0dp"/>
-
-    </LinearLayout>
+</LinearLayout>
 
 
     <!-- ================= LOADING ================= -->
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleSmall"
+<ProgressBar
+android:id="@+id/progressBar"
+style="?android:attr/progressBarStyleSmall"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:visibility="gone"
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-
-        android:visibility="gone"/>
-
-
-    <!-- ================= EMPTY ================= -->
-
-    <TextView
-        android:id="@+id/tvEmpty"
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_marginTop="40dp"
-
-        android:text="No orders yet 😔"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#888888"
-
-        android:gravity="center"
-        android:visibility="gone"/>
+app:layout_constraintTop_toBottomOf="@id/searchBox"
+app:layout_constraintBottom_toTopOf="@id/layoutBottomNav"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent"/>
 
 
     <!-- ================= LIST ================= -->
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvOrders"
+<androidx.recyclerview.widget.RecyclerView
+android:id="@+id/rvOrders"
+android:layout_width="0dp"
+android:layout_height="0dp"
 
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+android:padding="8dp"
+
+android:clipToPadding="false"
+
+app:layout_constraintTop_toBottomOf="@id/searchBox"
+app:layout_constraintBottom_toTopOf="@id/layoutBottomNav"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <!-- ================= EMPTY ================= -->
+
+<TextView
+android:id="@+id/tvEmpty"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+
+android:text="No orders yet 😔"
+android:textSize="16sp"
+android:textStyle="bold"
+android:textColor="#888888"
+
+android:gravity="center"
+android:visibility="gone"
+
+app:layout_constraintTop_toBottomOf="@id/searchBox"
+app:layout_constraintBottom_toTopOf="@id/layoutBottomNav"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <!-- ================= FLOATING BOTTOM NAV ================= -->
+
+<FrameLayout
+android:id="@+id/layoutBottomNav"
+android:layout_width="0dp"
+android:layout_height="56dp"
+
+android:layout_marginBottom="16dp"
+android:background="@drawable/bg_bottom_pill"
+android:padding="4dp"
+android:elevation="12dp"
+
+app:layout_constraintWidth_percent="0.8"
+app:layout_constraintBottom_toBottomOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent">
+
+
+<!-- SLIDING INDICATOR -->
+<View
+    android:id="@+id/tabIndicator"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@drawable/bg_tab_selected"/>
+
+
+<!-- TABS CONTAINER -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+
+    <!-- DELIVERY -->
+    <LinearLayout
+        android:id="@+id/tabDelivery"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
 
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="8dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        android:clipToPadding="false"
 
-        android:scrollbars="vertical"/>
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_delivery"
+            android:tint="#777777"/>
 
+
+        <TextView
+            android:id="@+id/btnDelivery"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+
+            android:gravity="center"
+            android:text="Delivery"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#777777"/>
+
+    </LinearLayout>
+
+
+    <!-- ORDERS -->
+    <LinearLayout
+        android:id="@+id/tabOrders"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+
+        android:gravity="center"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_orders"
+            android:tint="@android:color/white"/>
+
+
+        <TextView
+            android:id="@+id/btnOrders"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+
+            android:gravity="center"
+            android:text="Orders"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
 
 </LinearLayout>
+
+</FrameLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

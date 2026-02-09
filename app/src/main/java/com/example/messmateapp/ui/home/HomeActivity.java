@@ -42,12 +42,15 @@ import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import android.location.Address;
 import android.location.Geocoder;
+import com.example.messmateapp.ui.order.OrderHistoryActivity;
 
 import com.example.messmateapp.utils.SessionManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import java.util.List;
 import android.widget.LinearLayout;
+import android.os.Handler;
+import android.os.Looper;
 
 
 import java.util.ArrayList;
@@ -91,6 +94,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private View tabIndicator;
     private FrameLayout layoutBottomNav;
+
+    private View layoutLoading;
 
     // ================= ZOMATO STYLE FOOD NAMES =================
 
@@ -211,8 +216,12 @@ public class HomeActivity extends AppCompatActivity {
         tabOrders   = findViewById(R.id.tabOrders);
         btnDelivery = findViewById(R.id.btnDelivery);
         btnOrders   = findViewById(R.id.btnOrders);
-        tabIndicator = findViewById(R.id.tabIndicator);
+
+        tabIndicator   = findViewById(R.id.tabIndicator);
         layoutBottomNav = findViewById(R.id.layoutBottomNav);
+
+        // 🔥 LOADING OVERLAY (NEW)
+        layoutLoading = findViewById(R.id.layoutLoading);
 
         // 🔥 CART
         btnAllCarts = findViewById(R.id.btnAllCarts);
@@ -256,15 +265,27 @@ public class HomeActivity extends AppCompatActivity {
         // Orders Tab
         tabOrders.setOnClickListener(v -> {
 
-            selectOrders();
+            // Hide bottom nav
+            layoutBottomNav.setVisibility(View.GONE);
 
-            // ✅ Open Order History Screen
-            Intent intent = new Intent(
-                    HomeActivity.this,
-                    com.example.messmateapp.ui.order.OrderHistoryActivity.class
-            );
+            // Show loader
+            layoutLoading.setVisibility(View.VISIBLE);
 
-            startActivity(intent);
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+
+                Intent intent = new Intent(
+                        HomeActivity.this,
+                        OrderHistoryActivity.class
+                );
+
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+
+                // Reset UI
+                layoutLoading.setVisibility(View.GONE);
+                layoutBottomNav.setVisibility(View.VISIBLE);
+
+            }, 1500); // 1.5 sec delay
         });
     }
 

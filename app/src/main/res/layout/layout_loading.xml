@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutLoading"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:gravity="center"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+
+        <TextView
+            android:id="@+id/tvLoadingText"
+            android:layout_marginTop="16dp"
+            android:text="Finding your orders... ☕"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -44,6 +44,9 @@ android {
 
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+
+        // ✅ For java.time (TimeUtils)
+        coreLibraryDesugaringEnabled true
     }
 
     /* ================= VIEW BINDING ================= */
@@ -62,7 +65,7 @@ dependencies {
     implementation "com.google.android.material:material:1.12.0"
     implementation "androidx.activity:activity:1.9.3"
     implementation "androidx.constraintlayout:constraintlayout:2.2.0"
-    implementation "androidx.cardview:cardview:1.0.0"   // ✅ ADD THIS
+    implementation "androidx.cardview:cardview:1.0.0"
 
 
     /* ================= RECYCLER ================= */
@@ -98,9 +101,11 @@ dependencies {
 
     implementation "com.facebook.shimmer:shimmer:0.5.0"
 
+
     /* ================= PAYMENT ================= */
 
     implementation "com.razorpay:checkout:1.6.33"
+
 
     /* ================= MAP + LOCATION ================= */
 
@@ -119,6 +124,11 @@ dependencies {
 
     // 📊 Analytics
     implementation "com.google.firebase:firebase-analytics"
+
+
+    /* ================= DESUGARING (java.time support) ================= */
+
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
 
 
     /* ================= TEST ================= */
