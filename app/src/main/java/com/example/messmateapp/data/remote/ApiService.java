@@ -14,6 +14,8 @@ import com.example.messmateapp.data.model.VerifyResponse;
 import com.example.messmateapp.data.model.UserResponse;
 import com.example.messmateapp.data.model.OrderHistoryResponse;
 import com.example.messmateapp.domain.model.CartItem;
+import com.example.messmateapp.domain.model.ReorderResponse;
+
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +88,7 @@ public interface ApiService {
 
     // ✅ Reorder (Get Latest Items + Price + Availability)
     @GET("orders/{id}/reorder")
-    Call<List<CartItem>> reorderOrder(
+    Call<ReorderResponse> reorderOrder(
             @Path("id") String orderId
     );
 

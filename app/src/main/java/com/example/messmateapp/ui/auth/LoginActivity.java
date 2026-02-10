@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import com.example.messmateapp.R;
 import com.example.messmateapp.ui.home.HomeActivity;
@@ -127,6 +129,37 @@ public class LoginActivity extends AppCompatActivity {
 
         btnMore = findViewById(R.id.btnMore);
         savedLoader = findViewById(R.id.savedLoader);
+
+
+        // ✅ AUTO SEND OTP WHEN 10 DIGIT ENTERED
+        etPhone.addTextChangedListener(new android.text.TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if (s.length() == 10 && !otpLaunched && btnSendOtp.isEnabled()) {
+
+                    String number = s.toString();
+
+                    // Indian number validation
+                    if (number.matches("[6-9][0-9]{9}")) {
+
+                        sendOtp(); // 👈 SAME AS CONTINUE BUTTON
+
+                    } else {
+                        etPhone.setError("Enter valid number");
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+            }
+        });
     }
 
 

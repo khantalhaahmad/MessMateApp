@@ -6,8 +6,11 @@ import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -29,11 +32,11 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 
+import java.util.concurrent.TimeUnit;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import java.util.concurrent.TimeUnit;
 
 public class OtpActivity extends AppCompatActivity {
 
@@ -44,8 +47,12 @@ public class OtpActivity extends AppCompatActivity {
 
     private Button btnVerify;
     private ProgressBar progressBar;
-    private TextView tvNumber, tvResend;
+
+    private TextView tvNumber, tvResend, tvDidntGet, tvBackLogin;
+
     private ImageView btnBack;
+
+    private FrameLayout errorContainer;
 
 
     /* ================= FIREBASE ================= */
@@ -60,9 +67,10 @@ public class OtpActivity extends AppCompatActivity {
     /* ================= SESSION ================= */
 
     private SessionManager session;
-
     private CountDownTimer timer;
 
+
+    /* ================= ACTIVITY ================= */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +83,7 @@ public class OtpActivity extends AppCompatActivity {
         session = new SessionManager(this);
 
 
-        /* Get Data */
+        // Get Data
         verificationId = getIntent().getStringExtra("verificationId");
         mobile = getIntent().getStringExtra("mobile");
 
@@ -85,7 +93,7 @@ public class OtpActivity extends AppCompatActivity {
         }
 
 
-        /* If OTP not yet received */
+        // If OTP not yet received
         if (verificationId == null) {
 
             btnVerify.setEnabled(false);
@@ -95,11 +103,33 @@ public class OtpActivity extends AppCompatActivity {
 
         startResendTimer();
 
+        // Default disable
+        disableBackLogin();
 
-        btnVerify.setOnClickListener(v -> verifyOtp());
 
+        // Go Back Login
+        tvBackLogin.setOnClickListener(v -> {
+
+            if (!tvBackLogin.isEnabled()) return;
+
+            Intent intent =
+                    new Intent(OtpActivity.this, LoginActivity.class);
+
+            intent.setFlags(
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+            );
+
+            startActivity(intent);
+            finish();
+        });
+
+
+        // Back Icon
         btnBack.setOnClickListener(v -> finish());
 
+
+        // Resend
         tvResend.setOnClickListener(v -> resendOtp());
     }
 
@@ -108,15 +138,17 @@ public class OtpActivity extends AppCompatActivity {
 
     private void initViews() {
 
-        btnVerify = findViewById(R.id.btnVerifyOtp);
         progressBar = findViewById(R.id.progressBar);
 
         tvNumber = findViewById(R.id.tvNumber);
-        tvResend = findViewById(R.id.tvTimer);
+        tvDidntGet = findViewById(R.id.tvDidntGet);
+        tvResend = findViewById(R.id.tvResend);
+        tvBackLogin = findViewById(R.id.tvBackLogin);
 
         btnBack = findViewById(R.id.btnBack);
 
         otpLayout = findViewById(R.id.otpLayout);
+        errorContainer = findViewById(R.id.errorContainer);
 
 
         for (int i = 0; i < 6; i++) {
@@ -128,7 +160,31 @@ public class OtpActivity extends AppCompatActivity {
     }
 
 
-    /* ================= OTP MOVE ================= */
+    /* ================= ENABLE / DISABLE BACK ================= */
+
+    private void disableBackLogin() {
+
+        tvBackLogin.setEnabled(false);
+        tvBackLogin.setClickable(false);
+
+        tvBackLogin.setTextColor(
+                getResources().getColor(R.color.textHint)
+        );
+    }
+
+
+    private void enableBackLogin() {
+
+        tvBackLogin.setEnabled(true);
+        tvBackLogin.setClickable(true);
+
+        tvBackLogin.setTextColor(
+                getResources().getColor(R.color.accent)
+        );
+    }
+
+
+    /* ================= OTP INPUT ================= */
 
     private void setupOtpInputs() {
 
@@ -148,13 +204,15 @@ public class OtpActivity extends AppCompatActivity {
                         CharSequence s, int start, int before, int count) {
 
                     if (s.length() == 1 && index < 5) {
-
                         otpBoxes[index + 1].requestFocus();
                     }
 
                     if (s.length() == 0 && index > 0) {
-
                         otpBoxes[index - 1].requestFocus();
+                    }
+
+                    if (allOtpFilled() && !isVerifying) {
+                        verifyOtp();
                     }
                 }
 
@@ -166,14 +224,24 @@ public class OtpActivity extends AppCompatActivity {
     }
 
 
-    /* ================= GET OTP ================= */
+    private boolean allOtpFilled() {
+
+        for (EditText box : otpBoxes) {
+
+            if (box.getText().toString().trim().isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     private String getOtp() {
 
         StringBuilder otp = new StringBuilder();
 
         for (EditText box : otpBoxes) {
-
             otp.append(box.getText().toString().trim());
         }
 
@@ -184,16 +252,11 @@ public class OtpActivity extends AppCompatActivity {
     /* ================= LOADER ================= */
 
     private void showLoader() {
-
         progressBar.setVisibility(View.VISIBLE);
-        btnVerify.setEnabled(false);
     }
 
-
     private void hideLoader() {
-
         progressBar.setVisibility(View.GONE);
-        btnVerify.setEnabled(true);
     }
 
 
@@ -269,7 +332,6 @@ public class OtpActivity extends AppCompatActivity {
                         FirebaseUser user = mAuth.getCurrentUser();
 
                         if (user != null) {
-
                             sendToBackend(user);
                         }
 
@@ -279,11 +341,7 @@ public class OtpActivity extends AppCompatActivity {
 
                         hideLoader();
 
-                        Toast.makeText(
-                                this,
-                                "Invalid OTP",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        showWrongOtpEffect();
                     }
                 });
     }
@@ -318,18 +376,10 @@ public class OtpActivity extends AppCompatActivity {
                                             && res.body() != null
                                             && res.body().isSuccess()) {
 
-                                        /* ✅ SAVE SESSION */
                                         session.saveLogin(
                                                 res.body().getToken(),
                                                 mobile
                                         );
-
-                                        /* ✅ SAVE FOR CHECKOUT PAGE (IMPORTANT) */
-                                        getSharedPreferences("USER_DATA", MODE_PRIVATE)
-                                                .edit()
-                                                .putString("USER_PHONE", "+91 " + mobile)
-                                                .putString("USER_NAME", "Guest") // or backend name if available
-                                                .apply();
 
                                         startActivity(
                                                 new Intent(
@@ -339,16 +389,6 @@ public class OtpActivity extends AppCompatActivity {
                                         );
 
                                         finishAffinity();
-
-                                    } else {
-
-                                        isVerifying = false;
-
-                                        Toast.makeText(
-                                                OtpActivity.this,
-                                                "Login Failed",
-                                                Toast.LENGTH_SHORT
-                                        ).show();
                                     }
                                 }
 
@@ -358,29 +398,10 @@ public class OtpActivity extends AppCompatActivity {
                                         Throwable t) {
 
                                     hideLoader();
-
                                     isVerifying = false;
-
-                                    Toast.makeText(
-                                            OtpActivity.this,
-                                            t.getMessage(),
-                                            Toast.LENGTH_SHORT
-                                    ).show();
                                 }
                             });
 
-                })
-                .addOnFailureListener(e -> {
-
-                    hideLoader();
-
-                    isVerifying = false;
-
-                    Toast.makeText(
-                            this,
-                            e.getMessage(),
-                            Toast.LENGTH_SHORT
-                    ).show();
                 });
     }
 
@@ -421,22 +442,6 @@ public class OtpActivity extends AppCompatActivity {
                 public void onVerificationCompleted(
                         PhoneAuthCredential credential) {
 
-                    String code = credential.getSmsCode();
-
-
-                    /* Auto Fill */
-                    if (code != null && code.length() == 6) {
-
-                        for (int i = 0; i < 6; i++) {
-
-                            otpBoxes[i].setText(
-                                    String.valueOf(code.charAt(i))
-                            );
-                        }
-                    }
-
-
-                    /* Auto Verify */
                     autoVerify(credential);
                 }
 
@@ -467,29 +472,94 @@ public class OtpActivity extends AppCompatActivity {
             };
 
 
+    /* ================= WRONG OTP EFFECT ================= */
+
+    private void showWrongOtpEffect() {
+
+        isVerifying = false;
+
+        Animation shake =
+                AnimationUtils.loadAnimation(this, R.anim.shake);
+
+        otpLayout.startAnimation(shake);
+
+
+        showOtpError("The OTP entered is invalid. Please try again");
+
+
+        Animation fall =
+                AnimationUtils.loadAnimation(this, R.anim.otp_fall);
+
+        for (EditText box : otpBoxes) {
+
+            box.startAnimation(fall);
+            box.setText("");
+        }
+
+
+        otpBoxes[0].requestFocus();
+    }
+
+
+    private void showOtpError(String msg) {
+
+        errorContainer.removeAllViews();
+
+        View view = getLayoutInflater()
+                .inflate(R.layout.snackbar_otp_error, null);
+
+        TextView txt = view.findViewById(R.id.txtMsg);
+        txt.setText(msg);
+
+        errorContainer.addView(view);
+        errorContainer.setVisibility(View.VISIBLE);
+
+        errorContainer.postDelayed(() ->
+                        errorContainer.setVisibility(View.GONE),
+                2500);
+    }
+
+
     /* ================= TIMER ================= */
 
     private void startResendTimer() {
 
-        tvResend.setEnabled(false);
+        disableBackLogin();
 
+        tvResend.setEnabled(false);
+        tvResend.setClickable(false);
+
+        if (timer != null) {
+            timer.cancel();
+        }
 
         timer = new CountDownTimer(30000, 1000) {
 
             @Override
             public void onTick(long millisUntilFinished) {
 
-                tvResend.setText(
-                        "Resend in " + (millisUntilFinished / 1000) + "s"
+                int sec = (int) (millisUntilFinished / 1000);
+
+                tvResend.setText("Resend SMS in " + sec + "s");
+                tvResend.setTextColor(
+                        getResources().getColor(R.color.textHint)
                 );
+
+                disableBackLogin();
             }
 
             @Override
             public void onFinish() {
 
                 tvResend.setEnabled(true);
+                tvResend.setClickable(true);
 
-                tvResend.setText("Resend OTP");
+                tvResend.setText("Resend SMS");
+                tvResend.setTextColor(
+                        getResources().getColor(R.color.errorRed)
+                );
+
+                enableBackLogin();
             }
 
         }.start();

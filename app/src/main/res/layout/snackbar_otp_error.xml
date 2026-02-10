@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:background="@drawable/bg_otp_error">
+
+    <!-- App Icon -->
+    <ImageView
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/messmate_logo"
+        android:scaleType="centerCrop"/>
+
+    <!-- Message -->
+    <TextView
+        android:id="@+id/txtMsg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:text="Wrong OTP. Try again"
+        android:textSize="13sp"
+        android:textColor="#111827"
+        android:textStyle="bold"/>
+
+</LinearLayout>

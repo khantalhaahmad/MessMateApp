@@ -71,4 +71,13 @@
     <color name="sheetBackground">#FFFFFF</color>
     <color name="sheetHandle">#D1D5DB</color>
 
+
+    <!-- ================= OTP / TIMER ================= -->
+
+    <!-- Timer Disabled -->
+    <color name="gray_400">#9CA3AF</color>
+
+    <!-- Timer Active / Resend -->
+    <color name="green_500">#22C55E</color>
+
 </resources>

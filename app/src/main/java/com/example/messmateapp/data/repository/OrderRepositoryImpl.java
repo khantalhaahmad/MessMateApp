@@ -9,9 +9,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.messmateapp.data.model.OrderRequestDto;
 import com.example.messmateapp.data.model.OrderHistoryResponse;
 import com.example.messmateapp.domain.model.CartItem;
+import com.example.messmateapp.domain.model.ReorderResponse;
 import com.example.messmateapp.data.remote.ApiClient;
 import com.example.messmateapp.data.remote.ApiService;
 import com.example.messmateapp.domain.repository.OrderRepository;
+import com.example.messmateapp.ui.cart.CartManager;
 import com.example.messmateapp.utils.Resource;
 import com.example.messmateapp.utils.SessionManager;
 
@@ -25,13 +27,15 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     private final ApiService apiService;
     private final SessionManager sessionManager;
+    private final Context context;   // ✅ SAVE CONTEXT
 
 
     public OrderRepositoryImpl(Context context) {
 
+        this.context = context;
+
         sessionManager = new SessionManager(context);
 
-        // Auth client (Token handled by interceptor)
         apiService =
                 ApiClient
                         .getAuthClient(context)
@@ -39,7 +43,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
 
-    // ================= PLACE ORDER =================
+    /* ================= PLACE ORDER ================= */
 
     @Override
     public LiveData<Resource<Object>> placeOrder(OrderRequestDto order) {
@@ -49,8 +53,6 @@ public class OrderRepositoryImpl implements OrderRepository {
 
         liveData.setValue(Resource.loading());
 
-
-        /* ================= Validation ================= */
 
         if (order == null) {
 
@@ -78,8 +80,6 @@ public class OrderRepositoryImpl implements OrderRepository {
         }
 
 
-        /* ================= API Call ================= */
-
         apiService.placeOrder(order)
                 .enqueue(new Callback<Object>() {
 
@@ -102,7 +102,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                                     "❌ Failed: " + response.code());
 
                             liveData.setValue(
-                                    Resource.error("Order failed. Try again.")
+                                    Resource.error("Order failed")
                             );
                         }
                     }
@@ -115,11 +115,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                         Log.e("ORDER", "💥 API ERROR", t);
 
                         liveData.setValue(
-                                Resource.error(
-                                        t.getMessage() != null
-                                                ? t.getMessage()
-                                                : "Network error"
-                                )
+                                Resource.error("Network error")
                         );
                     }
                 });
@@ -128,7 +124,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
 
-    // ================= GET MY ORDERS =================
+    /* ================= GET MY ORDERS ================= */
 
     @Override
     public Call<OrderHistoryResponse> getMyOrders() {
@@ -141,8 +137,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
 
-    // ================= REORDER (LATEST DATA) =================
-    // 🔥 NEW METHOD (Important for Zomato Flow)
+    /* ================= REORDER (FINAL FIXED) ================= */
 
     @Override
     public LiveData<Resource<List<CartItem>>> reorderOrder(String orderId) {
@@ -157,6 +152,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 
         if (token == null || token.isEmpty()) {
 
+            Log.e("REORDER", "❌ Token missing");
+
             liveData.setValue(
                     Resource.error("Session expired")
             );
@@ -165,47 +162,118 @@ public class OrderRepositoryImpl implements OrderRepository {
         }
 
 
+        Log.d("REORDER", "📤 Calling reorder API: " + orderId);
+
+
         apiService.reorderOrder(orderId)
-                .enqueue(new Callback<List<CartItem>>() {
+                .enqueue(new Callback<ReorderResponse>() {
 
                     @Override
                     public void onResponse(
-                            Call<List<CartItem>> call,
-                            Response<List<CartItem>> response) {
+                            Call<ReorderResponse> call,
+                            Response<ReorderResponse> response) {
 
-                        if (response.isSuccessful()
-                                && response.body() != null) {
+                        Log.d("REORDER",
+                                "📥 Response Code = " + response.code());
 
-                            Log.d("REORDER", "✅ Reorder data fetched");
 
-                            liveData.setValue(
-                                    Resource.success(response.body())
-                            );
+                        /* ================= BASIC CHECK ================= */
 
-                        } else {
+                        if (!response.isSuccessful()
+                                || response.body() == null) {
 
-                            Log.e("REORDER",
-                                    "❌ Failed: " + response.code());
+                            Log.e("REORDER", "❌ Empty Response");
 
                             liveData.setValue(
                                     Resource.error("Reorder failed")
                             );
+                            return;
                         }
+
+
+                        ReorderResponse data = response.body();
+
+
+                        /* ================= NULL SAFETY ================= */
+
+                        if (!data.isSuccess()) {
+
+                            Log.e("REORDER", "❌ API Success = false");
+
+                            liveData.setValue(
+                                    Resource.error("Reorder failed")
+                            );
+                            return;
+                        }
+
+
+                        if (data.getRestaurant() == null) {
+
+                            Log.e("REORDER", "❌ Restaurant is NULL");
+
+                            liveData.setValue(
+                                    Resource.error("Restaurant not found")
+                            );
+                            return;
+                        }
+
+
+                        if (data.getCartItems() == null
+                                || data.getCartItems().isEmpty()) {
+
+                            Log.e("REORDER", "❌ CartItems EMPTY");
+
+                            liveData.setValue(
+                                    Resource.error("No items found")
+                            );
+                            return;
+                        }
+
+
+                        /* ================= DEBUG ================= */
+
+                        Log.d("REORDER", "✅ Restaurant: "
+                                + data.getRestaurant().getName());
+
+                        Log.d("REORDER", "✅ Items Count: "
+                                + data.getCartItems().size());
+
+
+                        /* ================= SET CART ================= */
+
+                        CartManager.setCartForRestaurant(
+
+                                data.getRestaurant().getId(),
+                                data.getCartItems(),
+                                data.getRestaurant().getName(),
+                                data.getRestaurant().getBanner(),
+
+                                context
+                        );
+
+
+                        Log.d("REORDER", "🛒 Cart Updated Successfully");
+
+
+                        /* ================= SUCCESS ================= */
+
+                        liveData.setValue(
+                                Resource.success(
+                                        data.getCartItems()
+                                )
+                        );
                     }
+
 
                     @Override
                     public void onFailure(
-                            Call<List<CartItem>> call,
+                            Call<ReorderResponse> call,
                             Throwable t) {
 
                         Log.e("REORDER", "💥 API ERROR", t);
 
                         liveData.setValue(
-                                Resource.error(
-                                        t.getMessage() != null
-                                                ? t.getMessage()
-                                                : "Network error"
-                                )
+                                Resource.error("Network error")
                         );
                     }
                 });

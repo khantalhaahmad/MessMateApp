@@ -286,11 +286,8 @@ public class OrderHistoryActivity extends AppCompatActivity {
 
                     String resId = first.getRestaurantId();
                     String resName = first.getRestaurantName();
+                    String resImage = ""; // later if available
 
-                    // (Optional) image if you have
-                    String resImage = "";
-
-                    // ✅ THIS IS MAIN FIX 🔥🔥🔥
                     CartManager.setCartForRestaurant(
                             resId,
                             items,
@@ -299,13 +296,15 @@ public class OrderHistoryActivity extends AppCompatActivity {
                             this
                     );
 
-                    // ✅ Open checkout
-                    Intent i = new Intent(
-                            this,
-                            CheckoutActivity.class
-                    );
+// ✅ Open checkout with extras
+                    Intent i = new Intent(this, CheckoutActivity.class);
+
+                    i.putExtra("RESTAURANT_ID", resId);
+                    i.putExtra("RESTAURANT_NAME", resName);
+                    i.putExtra("RESTAURANT_IMAGE", resImage);
 
                     startActivity(i);
+
                 });
     }
     // ================= UI STATES =================
