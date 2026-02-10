@@ -278,18 +278,27 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
             boolean added = CartManager.addItem(
 
                     new CartItem(
-                            item.getId(),
-                            item.getName(),
-                            (int) item.getPrice(),
-                            1,
-                            item.getImage(),
-                            item.isVeg() ? "veg" : "non-veg",
-                            "other",
-                            messId,     // ✅ Restaurant ID
-                            messName    // ✅ Restaurant Name
+                            item.getId(),                  // id
+                            item.getName(),                // name
+
+                            (int) item.getPrice(),         // price (old)
+                            (int) item.getPrice(),         // latestPrice (abhi same rakho)
+
+                            1,                             // quantity
+
+                            item.getImage(),               // image
+                            item.isVeg() ? "veg" : "non-veg", // type
+                            "other",                       // category
+
+                            messId,                        // restaurantId
+                            messName,                      // restaurantName
+
+                            true,                          // available
+                            false                          // priceUpdated
                     ),
 
-                    context   // ✅ Context yahin hona chahiye
+
+                    context
             );
 
 

@@ -2,11 +2,16 @@ package com.example.messmateapp.ui.order;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,8 +21,10 @@ import com.example.messmateapp.R;
 import com.example.messmateapp.data.model.OrderDto;
 import com.example.messmateapp.data.model.OrderHistoryResponse;
 import com.example.messmateapp.data.repository.OrderRepositoryImpl;
+import com.example.messmateapp.domain.model.CartItem;
+import com.example.messmateapp.ui.cart.CartManager;
+import com.example.messmateapp.ui.cart.CheckoutActivity;
 import com.example.messmateapp.ui.home.HomeActivity;
-import android.widget.FrameLayout;
 
 import java.util.List;
 
@@ -34,14 +41,17 @@ public class OrderHistoryActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView tvEmpty;
 
+    // Search
+    private EditText etSearch;
+
     // Bottom Nav
     private LinearLayout tabDelivery;
     private LinearLayout tabOrders;
     private FrameLayout layoutBottomNav;
     private View tabIndicator;
 
-
     private OrderRepositoryImpl repository;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +63,11 @@ public class OrderHistoryActivity extends AppCompatActivity {
         repository = new OrderRepositoryImpl(this);
 
         setupRecycler();
+        setupSearch();
+        setupBottomNav();
+        setOrdersSelected();
 
-        setupBottomNav();     // Bottom navigation setup
-        setOrdersSelected();  // Orders tab active
-
-        loadOrders();         // Load API data
+        loadOrders();
     }
 
 
@@ -66,18 +76,63 @@ public class OrderHistoryActivity extends AppCompatActivity {
     private void initViews() {
 
         rvOrders = findViewById(R.id.rvOrders);
-
         progressBar = findViewById(R.id.progressBar);
-
         tvEmpty = findViewById(R.id.tvEmpty);
 
-        // Bottom Nav
+        ImageView btnBack = findViewById(R.id.btnBack);
+
+        btnBack.setOnClickListener(v -> finish());
+
+        etSearch = findViewById(R.id.etSearch);
+
         layoutBottomNav = findViewById(R.id.layoutBottomNav);
-        tabIndicator   = findViewById(R.id.tabIndicator);
+        tabIndicator = findViewById(R.id.tabIndicator);
 
         tabDelivery = findViewById(R.id.tabDelivery);
-        tabOrders   = findViewById(R.id.tabOrders);
+        tabOrders = findViewById(R.id.tabOrders);
     }
+
+
+    // ================= SEARCH =================
+
+    private void setupSearch() {
+
+        etSearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(
+                    CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(
+                    CharSequence s, int start, int before, int count) {
+
+                if (adapter == null) return;
+
+                adapter.filter(s.toString());
+
+                if (adapter.getItemCount() == 0) {
+
+                    tvEmpty.setText("No matching orders 😕");
+                    tvEmpty.setVisibility(View.VISIBLE);
+                    rvOrders.setVisibility(View.GONE);
+
+                } else {
+
+                    tvEmpty.setVisibility(View.GONE);
+                    rvOrders.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+
+    // ================= TAB INDICATOR =================
 
     private void setOrdersSelected() {
 
@@ -85,39 +140,35 @@ public class OrderHistoryActivity extends AppCompatActivity {
 
             int width = layoutBottomNav.getWidth() / 2;
 
-            // half width
             tabIndicator.getLayoutParams().width = width;
 
-            // move to Orders (right side)
-            tabIndicator.animate().x(width).setDuration(200).start();
+            tabIndicator.animate()
+                    .x(width)
+                    .setDuration(200)
+                    .start();
 
             tabIndicator.requestLayout();
         });
     }
 
 
-
-
     // ================= BOTTOM NAV =================
 
     private void setupBottomNav() {
 
-        // Already on Orders → no action needed
         tabOrders.setOnClickListener(v -> {
-            // Do nothing (Already here)
+            // Already here
         });
 
-
-        // Go to Home (Delivery)
         tabDelivery.setOnClickListener(v -> {
 
             Intent intent =
-                    new Intent(OrderHistoryActivity.this,
+                    new Intent(
+                            OrderHistoryActivity.this,
                             HomeActivity.class);
 
             startActivity(intent);
-
-            finish(); // close current page
+            finish();
         });
     }
 
@@ -127,6 +178,13 @@ public class OrderHistoryActivity extends AppCompatActivity {
     private void setupRecycler() {
 
         adapter = new OrderHistoryAdapter();
+
+        // 🔥 Reorder Listener
+        adapter.setOnReorderClickListener(order -> {
+
+            handleReorder(order);
+
+        });
 
         rvOrders.setLayoutManager(
                 new LinearLayoutManager(this)
@@ -192,15 +250,76 @@ public class OrderHistoryActivity extends AppCompatActivity {
     }
 
 
+    // ================= REORDER =================
+
+    private void handleReorder(OrderDto order) {
+
+        repository.reorderOrder(order.getId())
+                .observe(this, res -> {
+
+                    if (!res.isSuccess() || res.getData() == null) {
+
+                        Toast.makeText(
+                                this,
+                                "Failed to reorder",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        return;
+                    }
+
+                    List<CartItem> items = res.getData();
+
+                    if (items.isEmpty()) {
+
+                        Toast.makeText(
+                                this,
+                                "No items available",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        return;
+                    }
+
+                    // ✅ Restaurant info from first item
+                    CartItem first = items.get(0);
+
+                    String resId = first.getRestaurantId();
+                    String resName = first.getRestaurantName();
+
+                    // (Optional) image if you have
+                    String resImage = "";
+
+                    // ✅ THIS IS MAIN FIX 🔥🔥🔥
+                    CartManager.setCartForRestaurant(
+                            resId,
+                            items,
+                            resName,
+                            resImage,
+                            this
+                    );
+
+                    // ✅ Open checkout
+                    Intent i = new Intent(
+                            this,
+                            CheckoutActivity.class
+                    );
+
+                    startActivity(i);
+                });
+    }
     // ================= UI STATES =================
 
     private void showLoading(boolean show) {
 
         if (show) {
+
             progressBar.setVisibility(View.VISIBLE);
             rvOrders.setVisibility(View.GONE);
             tvEmpty.setVisibility(View.GONE);
+
         } else {
+
             progressBar.setVisibility(View.GONE);
         }
     }

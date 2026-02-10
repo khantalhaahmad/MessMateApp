@@ -20,6 +20,7 @@ public class OrderDto {
     // ✅ Items (for quantity + name)
     private List<ItemDto> items;
 
+    private String mess_id;   // ✅ ADD THIS
 
     /* ================= GETTERS ================= */
 
@@ -81,6 +82,14 @@ public class OrderDto {
         public String getBanner() {
             return banner;
         }
+    }
+    // ✅ For Reorder (from backend mess_id)
+    public String getRestaurantId() {
+
+        if (mess_id != null && !mess_id.isEmpty())
+            return mess_id;
+
+        return "";
     }
 
     // ✅ For items

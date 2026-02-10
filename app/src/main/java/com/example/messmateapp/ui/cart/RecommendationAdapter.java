@@ -140,15 +140,23 @@ public class RecommendationAdapter
             // 🔥 THEN add item
             boolean added = CartManager.addItem(
                     new CartItem(
-                            item.mess_id,   // ya item.id
-                            item.name,
-                            item.price,
-                            1,
-                            item.image,
-                            item.type,
-                            item.category,
-                            messId,
-                            messName
+                            item.mess_id,          // id (ya item.id agar ho)
+                            item.name,             // name
+
+                            item.price,            // price (old)
+                            item.price,            // latestPrice (same for now)
+
+                            1,                     // quantity
+
+                            item.image,            // image
+                            item.type,             // type
+                            item.category,         // category
+
+                            messId,                // restaurantId
+                            messName,              // restaurantName
+
+                            true,                  // available
+                            false                  // priceUpdated
                     ),
                     context
             );

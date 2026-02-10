@@ -592,7 +592,140 @@ public class CartManager {
         return restaurantImages.getOrDefault(resId, "");
     }
 
+/* ==========================
+   🔁 REORDER SUPPORT
+   ========================== */
 
+
+    /**
+     * Replace cart of restaurant (used in Reorder)
+     */
+    public static synchronized void setCartForRestaurant(
+            String resId,
+            List<CartItem> items,
+            String resName,
+            String resImage,
+            Context ctx
+    ) {
+
+        if (resId == null || resId.isEmpty()
+                || items == null
+                || ctx == null) return;
+
+
+        // Load old data first
+        loadFromStorage(ctx);
+
+
+        // Remove old cart
+        cartMap.remove(resId);
+
+
+        // Prepare fresh list
+        List<CartItem> newList = new ArrayList<>();
+
+
+        for (CartItem item : items) {
+
+            if (item == null) continue;
+
+            // Skip unavailable
+            if (!item.isAvailable()) continue;
+
+            // Ensure quantity
+            if (item.getQuantity() <= 0) {
+                item.setQuantity(1);
+            }
+
+            newList.add(item);
+        }
+
+
+        // Save new cart
+        cartMap.put(resId, newList);
+
+
+        // Save meta
+        restaurantNames.put(resId, resName);
+
+        if (resImage != null && !resImage.isEmpty()) {
+            restaurantImages.put(resId, resImage);
+        }
+
+
+        currentRestaurantId = resId;
+
+        save(ctx);
+        saveLastRestaurant(ctx);
+
+
+        Log.d("REORDER", "Cart replaced for: " + resId);
+    }
+
+
+    /**
+     * Add multiple items (optional utility)
+     */
+    public static synchronized void addItemsBulk(
+            List<CartItem> items,
+            Context ctx
+    ) {
+
+        if (items == null || ctx == null) return;
+
+        List<CartItem> cart = getCurrentCart();
+
+        for (CartItem item : items) {
+
+            if (item == null || !item.isAvailable()) continue;
+
+            boolean found = false;
+
+            for (CartItem c : cart) {
+
+                if (c.getId().equals(item.getId())) {
+
+                    c.setQuantity(
+                            Math.min(
+                                    c.getQuantity() + item.getQuantity(),
+                                    MAX_QTY_PER_ITEM
+                            )
+                    );
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+
+                if (item.getQuantity() <= 0) {
+                    item.setQuantity(1);
+                }
+
+                cart.add(item);
+            }
+        }
+
+        save(ctx);
+    }
+
+
+    /**
+     * Remove unavailable items (safety)
+     */
+    public static synchronized void removeUnavailableItems(
+            Context ctx
+    ) {
+
+        List<CartItem> cart = getCurrentCart();
+
+        if (cart.isEmpty()) return;
+
+        cart.removeIf(c -> !c.isAvailable());
+
+        save(ctx);
+    }
     /* ==========================
        🔄 SYNC
        ========================== */

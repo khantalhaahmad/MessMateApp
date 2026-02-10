@@ -7,12 +7,15 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.messmateapp.data.model.OrderRequestDto;
+import com.example.messmateapp.data.model.OrderHistoryResponse;
+import com.example.messmateapp.domain.model.CartItem;
 import com.example.messmateapp.data.remote.ApiClient;
 import com.example.messmateapp.data.remote.ApiService;
 import com.example.messmateapp.domain.repository.OrderRepository;
 import com.example.messmateapp.utils.Resource;
 import com.example.messmateapp.utils.SessionManager;
-import com.example.messmateapp.data.model.OrderHistoryResponse;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,7 +31,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
         sessionManager = new SessionManager(context);
 
-        // ✅ Auth client (Token handled by interceptor)
+        // Auth client (Token handled by interceptor)
         apiService =
                 ApiClient
                         .getAuthClient(context)
@@ -36,6 +39,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
 
+    // ================= PLACE ORDER =================
 
     @Override
     public LiveData<Resource<Object>> placeOrder(OrderRequestDto order) {
@@ -123,6 +127,9 @@ public class OrderRepositoryImpl implements OrderRepository {
         return liveData;
     }
 
+
+    // ================= GET MY ORDERS =================
+
     @Override
     public Call<OrderHistoryResponse> getMyOrders() {
 
@@ -131,5 +138,78 @@ public class OrderRepositoryImpl implements OrderRepository {
         return apiService.getMyOrders(
                 "Bearer " + token
         );
+    }
+
+
+    // ================= REORDER (LATEST DATA) =================
+    // 🔥 NEW METHOD (Important for Zomato Flow)
+
+    @Override
+    public LiveData<Resource<List<CartItem>>> reorderOrder(String orderId) {
+
+        MutableLiveData<Resource<List<CartItem>>> liveData =
+                new MutableLiveData<>();
+
+        liveData.setValue(Resource.loading());
+
+
+        String token = sessionManager.getToken();
+
+        if (token == null || token.isEmpty()) {
+
+            liveData.setValue(
+                    Resource.error("Session expired")
+            );
+
+            return liveData;
+        }
+
+
+        apiService.reorderOrder(orderId)
+                .enqueue(new Callback<List<CartItem>>() {
+
+                    @Override
+                    public void onResponse(
+                            Call<List<CartItem>> call,
+                            Response<List<CartItem>> response) {
+
+                        if (response.isSuccessful()
+                                && response.body() != null) {
+
+                            Log.d("REORDER", "✅ Reorder data fetched");
+
+                            liveData.setValue(
+                                    Resource.success(response.body())
+                            );
+
+                        } else {
+
+                            Log.e("REORDER",
+                                    "❌ Failed: " + response.code());
+
+                            liveData.setValue(
+                                    Resource.error("Reorder failed")
+                            );
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(
+                            Call<List<CartItem>> call,
+                            Throwable t) {
+
+                        Log.e("REORDER", "💥 API ERROR", t);
+
+                        liveData.setValue(
+                                Resource.error(
+                                        t.getMessage() != null
+                                                ? t.getMessage()
+                                                : "Network error"
+                                )
+                        );
+                    }
+                });
+
+        return liveData;
     }
 }

@@ -13,7 +13,7 @@ import com.example.messmateapp.data.model.RestaurantDto;
 import com.example.messmateapp.data.model.VerifyResponse;
 import com.example.messmateapp.data.model.UserResponse;
 import com.example.messmateapp.data.model.OrderHistoryResponse;
-
+import com.example.messmateapp.domain.model.CartItem;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +84,11 @@ public interface ApiService {
             @Header("Authorization") String token
     );
 
+    // ✅ Reorder (Get Latest Items + Price + Availability)
+    @GET("orders/{id}/reorder")
+    Call<List<CartItem>> reorderOrder(
+            @Path("id") String orderId
+    );
 
     /* ================= PAYMENT ================= */
 

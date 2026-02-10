@@ -351,7 +351,50 @@ public class CheckoutActivity extends AppCompatActivity
     private void refreshCart() {
 
         cartList.clear();
-        cartList.addAll(CartManager.getItems());
+
+        List<CartItem> items = CartManager.getItems();
+
+        boolean hasUnavailable = false;
+        boolean hasPriceChange = false;
+
+
+        for (CartItem item : items) {
+
+            // ❌ Skip unavailable items
+            if (!item.isAvailable()) {
+                hasUnavailable = true;
+                continue;
+            }
+
+            // ⚠️ Detect price change
+            if (item.isPriceUpdated()) {
+                hasPriceChange = true;
+            }
+
+            cartList.add(item);
+        }
+
+
+        // 🔔 Show warnings
+
+        if (hasUnavailable) {
+
+            Toast.makeText(
+                    this,
+                    "Some items were unavailable and removed",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
+
+        if (hasPriceChange) {
+
+            Toast.makeText(
+                    this,
+                    "Some item prices have changed",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
+
 
         cartAdapter.notifyDataSetChanged();
     }
@@ -517,7 +560,9 @@ public class CheckoutActivity extends AppCompatActivity
 
         for (CartItem item : cartList) {
 
-            total += item.getPrice() * item.getQuantity();
+            if (!item.isAvailable()) continue;
+
+            total += item.getEffectivePrice() * item.getQuantity();
         }
 
         int deliveryFee = total > 300 ? 0 : 30;
@@ -1041,7 +1086,7 @@ public class CheckoutActivity extends AppCompatActivity
         for (CartItem item : cartList) {
 
             if (item != null) {
-                total += item.getPrice() * item.getQuantity();
+                total += item.getEffectivePrice() * item.getQuantity();
             }
         }
 
