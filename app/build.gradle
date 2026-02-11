@@ -125,6 +125,8 @@ dependencies {
     // 📊 Analytics
     implementation "com.google.firebase:firebase-analytics"
 
+// 🔔 Push Notifications (FCM)
+    implementation "com.google.firebase:firebase-messaging"
 
     /* ================= DESUGARING (java.time support) ================= */
 

@@ -31,13 +31,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-
+import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+import android.util.Log;
 public class OtpActivity extends AppCompatActivity {
 
     /* ================= UI ================= */
@@ -372,9 +372,24 @@ public class OtpActivity extends AppCompatActivity {
                                     hideLoader();
 
 
+
                                     if (res.isSuccessful()
                                             && res.body() != null
                                             && res.body().isSuccess()) {
+// ================= FCM TOKEN =================
+                                        FirebaseMessaging.getInstance().getToken()
+                                                .addOnCompleteListener(task -> {
+
+                                                    if (!task.isSuccessful()) return;
+
+                                                    String fcmToken = task.getResult();
+
+                                                    // Ab ye token backend ko bhejna hoga
+                                                    Log.d("FCM_TOKEN", fcmToken);
+
+                                                    // TODO: API me send karo
+                                                    // api.saveFcmToken("Bearer " + res.body().getToken(), fcmToken);
+                                                });
 
                                         session.saveLogin(
                                                 res.body().getToken(),

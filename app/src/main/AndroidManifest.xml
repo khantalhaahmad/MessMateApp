@@ -157,7 +157,17 @@
             android:exported="false"
             tools:replace="android:exported,android:theme" />
 
+        <!-- ================= FIREBASE NOTIFICATION SERVICE ================= -->
 
+        <service
+            android:name=".firebase.MyFirebaseMessagingService"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+
+        </service>
 
     </application>
 
