@@ -14,6 +14,7 @@ public class SessionManager {
     // Data
     private static final String KEY_TOKEN = "auth_token";
     private static final String KEY_MOBILE = "mobile_number";
+    private static final String KEY_NAME = "user_name";
 
     private final SharedPreferences pref;
     private final SharedPreferences.Editor editor;
@@ -127,6 +128,20 @@ public class SessionManager {
 
     public double getLng() {
         return pref.getFloat(KEY_LNG, 0);
+    }
+    /* ================= USER NAME ================= */
+
+    // Save Name
+    public void saveUserName(String name) {
+
+        editor.putString(KEY_NAME, name);
+        editor.apply();
+    }
+
+    // Get Name
+    public String getUserName() {
+
+        return pref.getString(KEY_NAME, null);
     }
 
     /* ================= SETTINGS ================= */

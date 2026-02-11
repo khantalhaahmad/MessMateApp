@@ -57,7 +57,7 @@
                 android:layout_height="64dp"
                 android:background="@drawable/bg_avatar_circle"
                 android:gravity="center"
-                android:text="T"
+                android:text=""
                 android:textColor="#FFFFFF"
                 android:textSize="28sp"
                 android:textStyle="bold"/>

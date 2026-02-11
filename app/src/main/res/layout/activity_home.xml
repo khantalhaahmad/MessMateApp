@@ -55,15 +55,18 @@
 
         </LinearLayout>
 
-        <!-- PROFILE -->
+        <!-- PROFILE AVATAR -->
 
-        <ImageView
-            android:id="@+id/imgProfile"
+        <TextView
+            android:id="@+id/tvHomeAvatar"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/ic_profile"
-            android:background="@drawable/circle_gray"
-            android:padding="6dp"
+            android:background="@drawable/bg_avatar_circle"
+            android:gravity="center"
+            android:text=""
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"/>

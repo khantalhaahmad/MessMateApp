@@ -9,10 +9,12 @@
 
     <!-- App Icon -->
     <ImageView
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:src="@drawable/messmate_logo"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"/>
+
 
     <!-- Message -->
     <TextView

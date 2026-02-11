@@ -73,7 +73,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private View emptyState;
 
-    private ImageView imgProfile;
+    private TextView tvHomeAvatar;
 
     private final List<Restaurant> allRestaurants = new ArrayList<>();
 
@@ -131,17 +131,39 @@ public class HomeActivity extends AppCompatActivity {
         tabDelivery.bringToFront();
         tabOrders.bringToFront();
 
-
         // 🔥 LOCATION SETUP
         setupLocation();
 
         updateAllCartsButton();
         setupAllCartsClick();
+
+        // 🔥 LOAD HOME AVATAR
+        loadHomeAvatar();
+    }
+    private void loadHomeAvatar() {
+
+        if (tvHomeAvatar == null || session == null) return;
+
+        String name = session.getUserName();
+
+        if (name != null && !name.trim().isEmpty()) {
+
+            char firstChar = name
+                    .trim()
+                    .toUpperCase()
+                    .charAt(0);
+
+            tvHomeAvatar.setText(String.valueOf(firstChar));
+
+        } else {
+
+            tvHomeAvatar.setText("U");
+        }
     }
     @Override
     protected void onResume() {
         super.onResume();
-
+        loadHomeAvatar();
         // 🔥 Refresh saved location
         if (session != null && tvLocation != null) {
 
@@ -151,8 +173,6 @@ public class HomeActivity extends AppCompatActivity {
                 tvLocation.setText(saved);
             }
         }
-
-
         // ================= CART =================
 
         CartManager.loadFromStorage(this);
@@ -203,10 +223,9 @@ public class HomeActivity extends AppCompatActivity {
         etSearch = findViewById(R.id.etSearch);
         tsSearchHint = findViewById(R.id.tsSearchHint);
         tvSearchPrefix = findViewById(R.id.tvSearchPrefix);
+        tvHomeAvatar = findViewById(R.id.tvHomeAvatar);
 
         emptyState = findViewById(R.id.layoutEmptyState);
-
-        imgProfile = findViewById(R.id.imgProfile);
 
         // 🔥 LOCATION TEXT
         tvLocation = findViewById(R.id.tvLocation);
@@ -294,9 +313,9 @@ public class HomeActivity extends AppCompatActivity {
     // ================= PROFILE =================
     private void setupProfileClick() {
 
-        if (imgProfile == null) return;
+        if (tvHomeAvatar == null) return;
 
-        imgProfile.setOnClickListener(v -> {
+        tvHomeAvatar.setOnClickListener(v -> {
 
             Intent intent = new Intent(
                     HomeActivity.this,

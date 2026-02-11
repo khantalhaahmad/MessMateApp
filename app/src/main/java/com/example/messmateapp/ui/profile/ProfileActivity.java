@@ -29,7 +29,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     /* ================= UI ================= */
 
-    private TextView tvName, tvEditText, tvEmail, tvPhone;
+    private TextView tvName, tvEditText, tvEmail, tvPhone, tvAvatar;
 
     private LinearLayout btnEdit, btnAddress;
 
@@ -113,6 +113,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
 
         tvName = findViewById(R.id.tvName);
+        tvAvatar = findViewById(R.id.tvAvatar);
         tvEditText = findViewById(R.id.tvEditText);
 
         // ✅ ADD THESE
@@ -127,7 +128,18 @@ public class ProfileActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
     }
 
+    private void setAvatarLetter(String name) {
 
+        if (name != null && !name.trim().isEmpty()) {
+
+            char firstChar = name
+                    .trim()
+                    .toUpperCase()
+                    .charAt(0);
+
+            tvAvatar.setText(String.valueOf(firstChar));
+        }
+    }
 
     /* ================= LOAD PROFILE ================= */
 
@@ -165,9 +177,18 @@ public class ProfileActivity extends AppCompatActivity {
 
                     UserResponse.User user = response.body().getUser();
 
-                    tvName.setText(user.getName());
+                    String name = user.getName();
+
+                    tvName.setText(name);
                     tvEmail.setText(user.getEmail());
                     tvPhone.setText(user.getPhone());
+
+// 🔥 SAVE NAME IN SESSION
+                    session.saveUserName(name);
+
+// 🔥 SET AVATAR
+                    setAvatarLetter(name);
+
 
                 } else {
 
