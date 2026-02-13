@@ -15,7 +15,7 @@ import com.example.messmateapp.data.model.UserResponse;
 import com.example.messmateapp.data.model.OrderHistoryResponse;
 import com.example.messmateapp.domain.model.CartItem;
 import com.example.messmateapp.domain.model.ReorderResponse;
-
+import com.example.messmateapp.data.model.FcmRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -161,5 +161,13 @@ public interface ApiService {
     Call<UserResponse> updateProfile(
             @Header("Authorization") String token,
             @Body Map<String, String> body
+    );
+    /* ================= FCM ================= */
+
+    // ✅ Save FCM Token (Multi Device Support)
+    @POST("save-fcm")
+    Call<Void> saveFcmToken(
+            @Header("Authorization") String token,
+            @Body FcmRequest body
     );
 }

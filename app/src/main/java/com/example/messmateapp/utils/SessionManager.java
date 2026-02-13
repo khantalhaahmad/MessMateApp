@@ -18,6 +18,8 @@ public class SessionManager {
 
     private final SharedPreferences pref;
     private final SharedPreferences.Editor editor;
+    // 🔔 FCM TOKEN
+    private static final String KEY_FCM = "fcm_token";
 
 
     public SessionManager(Context context) {
@@ -144,6 +146,14 @@ public class SessionManager {
         return pref.getString(KEY_NAME, null);
     }
 
+    public void saveFcmToken(String token) {
+        editor.putString(KEY_FCM, token);
+        editor.apply();
+    }
+
+    public String getFcmToken() {
+        return pref.getString(KEY_FCM, null);
+    }
     /* ================= SETTINGS ================= */
 
     // Dark Mode

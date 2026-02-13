@@ -25,6 +25,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.example.messmateapp.data.remote.ApiClient;
+import com.example.messmateapp.data.remote.ApiService;
+import com.example.messmateapp.data.model.FcmRequest;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.concurrent.TimeUnit;
 
@@ -333,7 +341,39 @@ public class LoginActivity extends AppCompatActivity {
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
+    private void registerFcmToken() {
 
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+
+                    if (!task.isSuccessful()) return;
+
+                    String token = task.getResult();
+
+                    ApiService api =
+                            ApiClient.getClient().create(ApiService.class);
+
+                    FcmRequest request = new FcmRequest(token, "android");
+
+                    api.saveFcmToken("Bearer " + session.getToken(), request)
+                            .enqueue(new Callback<Void>() {
+
+                                @Override
+                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                    if (response.isSuccessful()) {
+                                        System.out.println("✅ FCM token saved");
+                                    } else {
+                                        System.out.println("⚠️ Save failed: " + response.code());
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<Void> call, Throwable t) {
+                                    System.out.println("❌ FCM save failed: " + t.getMessage());
+                                }
+                            });
+                });
+    }
     /* ================= FIREBASE CALLBACK ================= */
 
     private final PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks =

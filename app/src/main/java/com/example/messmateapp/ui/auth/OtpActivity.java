@@ -33,6 +33,7 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.concurrent.TimeUnit;
+import com.example.messmateapp.data.model.FcmRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -356,10 +357,8 @@ public class OtpActivity extends AppCompatActivity {
 
                     String firebaseToken = result.getToken();
 
-
                     ApiService api =
                             ApiClient.getClient().create(ApiService.class);
-
 
                     api.firebaseLogin("Bearer " + firebaseToken)
                             .enqueue(new Callback<AuthResponse>() {
@@ -371,31 +370,56 @@ public class OtpActivity extends AppCompatActivity {
 
                                     hideLoader();
 
-
-
                                     if (res.isSuccessful()
                                             && res.body() != null
                                             && res.body().isSuccess()) {
-// ================= FCM TOKEN =================
+
+                                        String jwtToken = res.body().getToken();
+
+                                        // ✅ SAVE LOGIN SESSION
+                                        session.saveLogin(jwtToken, mobile);
+
+                                        // ================= FCM TOKEN SAVE =================
                                         FirebaseMessaging.getInstance().getToken()
                                                 .addOnCompleteListener(task -> {
 
-                                                    if (!task.isSuccessful()) return;
+                                                    if (!task.isSuccessful()) {
+                                                        Log.e("FCM", "Failed to get FCM token");
+                                                        return;
+                                                    }
 
                                                     String fcmToken = task.getResult();
 
-                                                    // Ab ye token backend ko bhejna hoga
                                                     Log.d("FCM_TOKEN", fcmToken);
 
-                                                    // TODO: API me send karo
-                                                    // api.saveFcmToken("Bearer " + res.body().getToken(), fcmToken);
+                                                    // 🔥 Create request body
+                                                    FcmRequest request =
+                                                            new FcmRequest(fcmToken, "android");
+
+                                                    // 🔥 Send to backend
+                                                    api.saveFcmToken(
+                                                            "Bearer " + jwtToken,
+                                                            request
+                                                    ).enqueue(new Callback<Void>() {
+                                                        @Override
+                                                        public void onResponse(
+                                                                Call<Void> call,
+                                                                Response<Void> response) {
+
+                                                            Log.d("FCM", "FCM token saved to backend");
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(
+                                                                Call<Void> call,
+                                                                Throwable t) {
+
+                                                            Log.e("FCM", "Failed to save FCM token");
+                                                        }
+                                                    });
                                                 });
 
-                                        session.saveLogin(
-                                                res.body().getToken(),
-                                                mobile
-                                        );
-
+                                        // ✅ GO TO HOME
                                         startActivity(
                                                 new Intent(
                                                         OtpActivity.this,
@@ -404,6 +428,16 @@ public class OtpActivity extends AppCompatActivity {
                                         );
 
                                         finishAffinity();
+
+                                    } else {
+
+                                        isVerifying = false;
+
+                                        Toast.makeText(
+                                                OtpActivity.this,
+                                                "Login failed",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
                                     }
                                 }
 
@@ -414,12 +448,48 @@ public class OtpActivity extends AppCompatActivity {
 
                                     hideLoader();
                                     isVerifying = false;
+
+                                    Toast.makeText(
+                                            OtpActivity.this,
+                                            "Server error",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
                                 }
                             });
 
                 });
     }
+    private void registerFcmToken(String jwtToken) {
 
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+
+                    if (!task.isSuccessful()) return;
+
+                    String fcmToken = task.getResult();
+
+                    Log.d("FCM_TOKEN", fcmToken);
+
+                    ApiService api =
+                            ApiClient.getClient().create(ApiService.class);
+
+                    api.saveFcmToken(
+                            "Bearer " + jwtToken,
+                            new FcmRequest(fcmToken, "android")
+                    ).enqueue(new Callback<Void>() {
+
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            Log.d("FCM_SAVE", "Token saved successfully");
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Log.e("FCM_SAVE", "Token save failed");
+                        }
+                    });
+                });
+    }
 
     /* ================= RESEND ================= */
 
